@@ -1,0 +1,54 @@
+﻿<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container">
+            <NavLink class="navbar-brand" href="" Match="NavLinkMatch.All">
+                DailyApplication
+            </NavLink>
+            <button class="navbar-toggler" @onclick="ToggleNavMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="@NavMenuCssClass navbar-collapse d-sm-inline-flex justify-content-between" @onclick="ToggleNavMenu">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <NavLink class="nav-link text-dark" href="events">
+                            Events
+                        </NavLink>
+                    </li>
+                </ul>
+                    <ul class="navbar-nav">
+                    @*@if (SignInManager.IsSignedIn(User))
+                    {
+                        <li class="nav-item">
+                            <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity.Name!</a>
+                        </li>
+                        <li class="nav-item">
+                            <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+                            </form>
+                        </li>
+                    }
+                    else
+                    {*@
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                        </li>
+                    @*}*@
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

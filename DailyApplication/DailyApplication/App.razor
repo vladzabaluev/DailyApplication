@@ -1,4 +1,26 @@
-﻿<h3>App</h3>
+﻿@inherits LayoutComponentBase
+<Navbar />
+<div class="text-center">
+    <h1 class="display-4">Welcome to Blazor</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+<article class="content px-4">
+    @Body
+</article>
+<Footer />
+
+@*<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <PageTitle>Not found</PageTitle>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <p role="alert">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>*@
 
 @code {
 
