@@ -1,16 +1,98 @@
 ﻿@page "/events"
 
-<h1>Counter</h1>
+@*@model IEnumerable<DailyApplication.Models.Event>*@
+@using System.Globalization;
+@using Microsoft.VisualBasic;
 
-<p role="status">Current count: @currentCount</p>
+<h1>События</h1>
+<a class="btn btn-outline-dark mt-1 mb-3" role="button" asp-action="Create">Create New</a>
+@{
+    string[] weekDays = { "Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб" };
+    DateTime now = DateTime.Now;
+    DateTime UTC = DateTime.UtcNow;
+    DateTime today = DateTime.Today;
+    CultureInfo myCI = new CultureInfo("en-US");
+    Calendar myCal = myCI.Calendar;
+    CalendarWeekRule myCWR = myCI.DateTimeFormat.CalendarWeekRule;
+    DayOfWeek myFirstDOW = myCI.DateTimeFormat.FirstDayOfWeek;
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+    DateTime GetFirstDateOfWeek(DateTime dayInWeek, DayOfWeek firstDay)
+    {
+        DateTime firstDayInWeek = dayInWeek.Date;
+        while (firstDayInWeek.DayOfWeek != firstDay)
+            firstDayInWeek = firstDayInWeek.AddDays(-1);
+
+        return firstDayInWeek;
+    }
+
+    var date1 = new DateTime(DateTime.Now.Year, 1, 1, 0, 0, 0);
+    date1 = GetFirstDateOfWeek(date1, 0);
+    date1 = myCal.AddWeeks(date1, myCal.GetWeekOfYear(DateTime.Now, myCWR, myFirstDOW) - 1);
+    DateTime[] week = new DateTime[7];
+    week[0] = date1;
+    for(int i = 1; i < 7; i++)
+    {
+        week[i] = week[i - 1].AddDays(1);
+    }
+    //DayOfWeek getWeekDay(DateTime date) {
+        //DayOfWeek weekDay = date.DayOfWeek;
+        //return weekDay;
+        //}
+}
+<div class="row mx-0">
+    @for (var weekDay = 0; weekDay < 7; weekDay++)
+    {
+            <div class="col px-1">
+                <div class="border-bottom border-secondary px-1">
+                    @if (today == week[weekDay])
+                    {
+                        <h5 class="text-right">@now.ToString("m")</h5>
+                        <h6 class="text-right">@weekDays[weekDay]</h6>
+                    }
+                    else
+                    {
+                        <h5 class="text-right text-secondary">@week[weekDay].ToString("m")</h5>
+                        <h6 class="text-right text-secondary">@weekDays[weekDay]</h6>
+                    }
+                    
+                    @*@if (today == week[weekDay])
+                    {
+                        <p class="font-weight-bold">@weekDays[weekDay], @now.ToString("m")</p>
+                            
+                    }
+                    else
+                    {
+                        <p class="font-weight-bold">@weekDays[weekDay], @week[weekDay].ToString("m")</p>
+                            
+                    }*@
+                </div>
+                <div class="px-2">
+                    @*@foreach (var item in events)
+                    {
+                        @if (item.DeadlineTime.ToString("MM/dd/yyyy") == week[weekDay].ToString("MM/dd/yyyy"))
+                        {
+                            <h5 class="py-1">
+                                @item.Name
+                            </h5>
+                        }
+                    }*@
+                </div>
+            </div>
+    }
+    
+</div>
 
 @code {
-    private int currentCount = 0;
+    private IEnumerable<Event> events { get; set; }
 
-    private void IncrementCount()
+    protected async override Task OnInitializedAsync()
     {
-        currentCount++;
+
+        //await _context.Event.ToListAsync();
     }
+
+    //public async Task<IActionResult> Index()
+    //{
+        //await _context.Event.ToListAsync();
+    //}
 }
