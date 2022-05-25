@@ -1,11 +1,11 @@
 ﻿@page "/events"
 
-@*@model IEnumerable<DailyApplication.Models.Event>*@
 @using System.Globalization;
 @using Microsoft.VisualBasic;
+@inject DailyApplication.Controllers.EventsController EventService;
 
 <h1>События</h1>
-<a class="btn btn-outline-dark mt-1 mb-3" role="button" asp-action="Create">Create New</a>
+<a class="btn btn-outline-dark mt-1 mb-3" role="button" href="/events/create">Create New</a>
 @{
     string[] weekDays = { "Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб" };
     DateTime now = DateTime.Now;
@@ -83,16 +83,20 @@
 </div>
 
 @code {
-    private IEnumerable<Event> events { get; set; }
+    private IEnumerable<Event> events = new List<Event>();
 
-    protected async override Task OnInitializedAsync()
+    //protected async override Task OnInitializedAsync()
+    //{
+    //    //await _context.Event.ToListAsync();
+    //}
+
+    protected override void OnInitialized()
     {
-
-        //await _context.Event.ToListAsync();
+        events = EventService.GetAllEvents();
     }
 
     //public async Task<IActionResult> Index()
     //{
-        //await _context.Event.ToListAsync();
+    //await _context.Event.ToListAsync();
     //}
 }

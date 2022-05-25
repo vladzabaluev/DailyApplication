@@ -29,6 +29,12 @@ namespace DailyApplication.Controllers
             return View(await _context.Event.ToListAsync());
         }
 
+        public IEnumerable<Event> GetAllEvents()
+        {
+            Console.WriteLine(_context.Event);
+            return _context.Event.ToList();
+        }
+
         [Authorize]
         public async Task<IActionResult> ShowUsersEvents()
         {
@@ -78,6 +84,11 @@ namespace DailyApplication.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(@event);
+        }
+
+        public void AddEvent(string Id, string Name, string Description, DateTime DeadlineTime)
+        {
+
         }
 
         public async Task<IActionResult> DoneEvent(int? id)

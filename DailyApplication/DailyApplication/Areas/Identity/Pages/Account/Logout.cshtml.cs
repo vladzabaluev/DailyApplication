@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DailyApplication.Areas.Identity.Pages.Account
 {
+    [IgnoreAntiforgeryToken]
     [AllowAnonymous]
     public class LogoutModel : PageModel
     {

@@ -12,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DailyApplication.Models;
+using DailyApplication.Controllers;
 
 namespace DailyApplication
 {
@@ -37,6 +39,8 @@ namespace DailyApplication
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddServerSideBlazor();
+
+            services.AddScoped<EventsController>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,6 +67,7 @@ namespace DailyApplication
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapRazorPages();
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
