@@ -45,7 +45,7 @@
 
     private void AddEvent()
     {
-        if(!string.IsNullOrWhiteSpace(eventName) && !string.IsNullOrWhiteSpace(eventDescription))
+        if(!string.IsNullOrWhiteSpace(eventName))
         {
             EventService.CreateEvent(eventName, eventDescription, eventDeadline);
 

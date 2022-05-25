@@ -1,0 +1,31 @@
+﻿@inject DailyApplication.Controllers.EventsController EventService;
+
+<div class="container border-top" @onmouseover=ToggleDelBtn @onmouseout=ToggleDelBtn>
+    <div class="row">
+        <div class="col-9">
+            <h5 class="py-1">
+                @item.Name
+            </h5>
+        </div>
+        <div class="col-3 d-flex align-self-center px-0 justify-content-end">
+            <button class="@DelBtnClass text-right btn btn-outline-dark px-2 py-0" @onclick="@(() => DeleteEvent.InvokeAsync(item.Id))">X</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Event item { get; set; }
+
+    private bool collapseDelBtn = true;
+
+    private string? DelBtnClass => collapseDelBtn ? "collapse" : null;
+
+    private void ToggleDelBtn()
+    {
+        collapseDelBtn = !collapseDelBtn;
+    }
+
+    [Parameter]
+    public EventCallback<int> DeleteEvent { get; set; }
+}
