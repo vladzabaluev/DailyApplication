@@ -67,7 +67,7 @@
                     }*@
                 </div>
                 <div class="px-2">
-                    @*@foreach (var item in events)
+                    @foreach (var item in events)
                     {
                         @if (item.DeadlineTime.ToString("MM/dd/yyyy") == week[weekDay].ToString("MM/dd/yyyy"))
                         {
@@ -75,7 +75,7 @@
                                 @item.Name
                             </h5>
                         }
-                    }*@
+                    }
                 </div>
             </div>
     }
