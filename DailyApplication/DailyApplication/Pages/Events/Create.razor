@@ -8,37 +8,50 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <form @onsubmit=AddEvent>
+            <div class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <label class="control-label"></label>
+                <input class="form-control" placeholder="Название" @bind=eventName/>
+                <span class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+                <label class="control-label"></label>
+                <input type="textarea" class="form-control" placeholder="Описание" @bind=eventDescription/>
+                <span class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="DeadlineTime" class="control-label"></label>
-                <input asp-for="DeadlineTime" class="form-control" />
-                <span asp-validation-for="DeadlineTime" class="text-danger"></span>
+                <label class="control-label"></label>
+                <input @bind:format="yyyy-MM-ddTHH:mm" type="datetime-local" class="form-control" placeholder="Время окончания" @bind=eventDeadline/>
+                <span class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Создать" class="btn btn-primary" @onclick=AddEvent/>
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <NavLink class="" href="events">
+        Back to List
+    </NavLink>
 </div>
 
 @code {
-    protected override void OnParametersSet()
+    private string eventName;
+    private string eventDescription;
+    private DateTime eventDeadline = DateTime.Now;
+
+    private void AddEvent()
     {
-        EventService.Create();
+        if(!string.IsNullOrWhiteSpace(eventName) && !string.IsNullOrWhiteSpace(eventDescription))
+        {
+            EventService.CreateEvent(eventName, eventDescription, eventDeadline);
+
+            eventName = string.Empty;
+            eventDescription = string.Empty;
+            eventDeadline = DateTime.Now;
+        }
     }
 }

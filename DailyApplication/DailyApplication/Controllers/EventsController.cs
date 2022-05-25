@@ -23,16 +23,57 @@ namespace DailyApplication.Controllers
             _userManager = userManager;
         }
 
+        // C
+        public void CreateEvent(string Name, string Description, DateTime DeadlineTime)
+        {
+            Console.WriteLine(Name);
+            Console.WriteLine(Description);
+            Console.WriteLine(DeadlineTime);
+            //Console.WriteLine(_userManager.GetUserAsync(User).Result);
+            Event newEvent = new Event()
+            {
+                Name = Name,
+                Description = Description,
+                //User = _userManager.GetUserAsync(User).Result,
+                DeadlineTime = DeadlineTime,
+                IsDone = false
+
+        };
+            _context.Event.Add(newEvent);
+            _context.SaveChanges();
+        }
+
+        // R
+        public IEnumerable<Event> GetAllEvents()
+        {
+            return _context.Event;
+        }
+
+        // U
+        public void UpdateEvent(Event changedEvent)
+        {
+            var item = _context.Event.Attach(changedEvent);
+            item.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+
+            _context.SaveChanges();
+        }
+
+        // D
+        public void DeleteEvent(int Id)
+        {
+            var deletedItem = _context.Event.Find(Id);
+
+            if(deletedItem != null)
+            {
+                _context.Event.Remove(deletedItem);
+                _context.SaveChanges();
+            }
+        }
+
         // GET: Events
         public async Task<IActionResult> Index()
         {
             return View(await _context.Event.ToListAsync());
-        }
-
-        public IEnumerable<Event> GetAllEvents()
-        {
-            Console.WriteLine(_context.Event);
-            return _context.Event.ToList();
         }
 
         [Authorize]
