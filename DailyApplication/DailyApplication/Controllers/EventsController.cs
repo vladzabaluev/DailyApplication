@@ -97,7 +97,13 @@ namespace DailyApplication.Controllers
         {
             return _context.Event.ToList();
         }
-
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public List<Event> GetUserEvents(ClaimsPrincipal user)
+        {
+            return _context.Event.Where(ev => ev.User == _userManager.GetUserAsync(user).Result).ToList();
+        }
         //public List<Event> GetUserEvents()
         //{
         //    return _context.Event.Where(ev => ev.User == _userManager.GetUserAsync(User).Result).ToList();
