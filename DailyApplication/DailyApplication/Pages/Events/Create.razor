@@ -79,8 +79,7 @@
 
             Event newEvent = new Event() { Name = eventName, Description = eventDescription, DeadlineTime = eventDeadline, IsDone = false };
 
-
-            CreateEvent.InvokeAsync(newEvent);
+            await CreateEvent.InvokeAsync(newEvent);
         }
 
     }

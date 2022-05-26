@@ -14,12 +14,13 @@
 </div>
 
 @code {
+    
     [Parameter]
     public Event item { get; set; }
 
     private bool collapseDelBtn = true;
 
-
+    #nullable enable
     private string? DelBtnClass => collapseDelBtn ? "collapse" : null;
 
     private void ToggleDelBtn()
