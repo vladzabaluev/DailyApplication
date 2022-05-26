@@ -1,4 +1,5 @@
-﻿@inject DailyApplication.Controllers.EventsController EventService;
+﻿@inject DailyApplication.Controllers.EventsController _eventController;
+@using System.Security.Claims
 
 <h1>Create</h1>
 
@@ -6,25 +7,25 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form @onsubmit=AddEvent>
+        <form>
             <div class="text-danger"></div>
             <div class="form-group">
                 <label class="control-label"></label>
-                <input class="form-control" placeholder="Название" @bind=eventName/>
+                <input class="form-control" placeholder="Название" @bind=eventName />
                 <span class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label class="control-label"></label>
-                <input type="textarea" class="form-control" placeholder="Описание" @bind=eventDescription/>
+                <input type="textarea" class="form-control" placeholder="Описание" @bind=eventDescription />
                 <span class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label class="control-label"></label>
-                <input @bind:format="yyyy-MM-ddTHH:mm" type="datetime-local" class="form-control" placeholder="Время окончания" @bind=eventDeadline/>
+                <input @bind:format="yyyy-MM-ddTHH:mm" type="datetime-local" class="form-control" placeholder="Время окончания" @bind=eventDeadline />
                 <span class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Создать" class="btn btn-primary" @onclick=AddEvent/>
+                <input type="submit" value="Создать" class="btn btn-primary" @onclick=AddEvent />
             </div>
         </form>
     </div>
@@ -39,16 +40,21 @@
 @code {
     [Parameter]
     public EventCallback Toggle { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     private string eventName;
     private string eventDescription;
     private DateTime eventDeadline = DateTime.Now;
 
-    private void AddEvent()
+    private async void AddEvent()
     {
-        if(!string.IsNullOrWhiteSpace(eventName))
+        AuthenticationState currentAuth = await authenticationStateTask;
+        ClaimsPrincipal currentUser = currentAuth.User;
+
+        if (!string.IsNullOrWhiteSpace(eventName))
         {
-            EventService.CreateEvent(eventName, eventDescription, eventDeadline);
+            _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline);
 
             eventName = string.Empty;
             eventDescription = string.Empty;

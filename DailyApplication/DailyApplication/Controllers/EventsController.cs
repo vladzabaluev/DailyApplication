@@ -9,6 +9,8 @@ using DailyApplication.Data;
 using DailyApplication.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using DailyApplication.Pages.Events;
 
 namespace DailyApplication.Controllers
 {
@@ -23,30 +25,47 @@ namespace DailyApplication.Controllers
             _userManager = userManager;
         }
 
-        // C
-        public void CreateEvent(string Name, string Description, DateTime DeadlineTime)
+        // Созда событие (сделать асинхронным)
+        public void CreateEvent(string Name, string Description, ClaimsPrincipal User, DateTime DeadlineTime)
         {
-            Console.WriteLine(Name);
-            Console.WriteLine(Description);
-            Console.WriteLine(DeadlineTime);
-            //Console.WriteLine(_userManager.GetUserAsync(User).Result);
             Event newEvent = new Event()
             {
                 Name = Name,
                 Description = Description,
-                //User = _userManager.GetUserAsync(User).Result,
+                User = _userManager.GetUserAsync(User).Result,
                 DeadlineTime = DeadlineTime,
                 IsDone = false
-
-        };
+            };
             _context.Event.Add(newEvent);
             _context.SaveChanges();
         }
 
-        // R
-        public IEnumerable<Event> GetAllEvents()
+        // Чтение всех ивентов
+        //public IEnumerable<Event> Index()
+        //{
+        //    return _context.Event;
+        //}
+
+        //public async Task<> Index()
+        //{
+        //    return await _context.Event.ToArrayAsync();
+        //    //await _context.Event.ToListAsync();
+        //    //  return _context.Event.ToListAsync();
+        //    //   return RedirectToPage("Events");// (Pages.Events.Events, await _context.Event.ToListAsync());
+        //}
+        public List<Event> GetAllEvents()
         {
-            return _context.Event;
+            return _context.Event.ToList();
+        }
+
+        public List<Event> GetUserEvents()
+        {
+            return _context.Event.Where(ev => ev.User == _userManager.GetUserAsync(User).Result).ToList();
+        }
+
+        public async Task<IActionResult> Prikol()
+        {
+            return new RedirectToPageResult("Events", new { events = await _context.Event.ToListAsync() });
         }
 
         // U
@@ -63,7 +82,7 @@ namespace DailyApplication.Controllers
         {
             var deletedItem = _context.Event.Find(Id);
 
-            if(deletedItem != null)
+            if (deletedItem != null)
             {
                 _context.Event.Remove(deletedItem);
                 _context.SaveChanges();
@@ -71,17 +90,17 @@ namespace DailyApplication.Controllers
         }
 
         // GET: Events
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Event.ToListAsync());
-        }
+        //public async Task<IActionResult> Index()
+        //{
+        //    return View(await _context.Event.ToListAsync());
+        //}
 
-        [Authorize]
-        public async Task<IActionResult> ShowUsersEvents()
-        {
-            return View("Index", await _context.Event.
-                Where(ev => ev.User == _userManager.GetUserAsync(User).Result).ToListAsync());
-        }
+        //[Authorize]
+        //public async Task<IActionResult> ShowUsersEvents()
+        //{
+        //    return View("Index", await _context.Event.
+        //        Where(ev => ev.User == _userManager.GetUserAsync(User).Result).ToListAsync());
+        //}
 
         [Authorize]
         public async Task<IActionResult> Details(int? id)
@@ -127,11 +146,6 @@ namespace DailyApplication.Controllers
             return View(@event);
         }
 
-        public void AddEvent(string Id, string Name, string Description, DateTime DeadlineTime)
-        {
-
-        }
-
         public async Task<IActionResult> DoneEvent(int? id)
         {
             if (id == null)
@@ -146,7 +160,7 @@ namespace DailyApplication.Controllers
             processEvent.IsDone = true;
             _context.Update(processEvent);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(ShowUsersEvents));
+            return RedirectToAction(nameof(GetUserEvents));
         }
 
         // GET: NewEvents/Edit/5

@@ -1,14 +1,13 @@
-﻿@page "/events"
+﻿@page "/Events"
 
 @using System.Globalization;
 @using Microsoft.VisualBasic;
-@inject DailyApplication.Controllers.EventsController EventService;
+@inject DailyApplication.Controllers.EventsController _eventController;
 
 <h1>События</h1>
 <Modal Collapse="@CollapseModal" Toggle="@ToggleModal">
-    <Create Toggle="@ToggleModal"/>
+    <Create Toggle="@ToggleModal" />
 </Modal>
-
 <button class="btn btn-outline-dark mt-1 mb-3" @onclick=ToggleModal>Создать</button>
 @{
     string[] weekDays = { "Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб" };
@@ -34,57 +33,57 @@
     date1 = myCal.AddWeeks(date1, myCal.GetWeekOfYear(DateTime.Now, myCWR, myFirstDOW) - 1);
     DateTime[] week = new DateTime[7];
     week[0] = date1;
-    for(int i = 1; i < 7; i++)
+    for (int i = 1; i < 7; i++)
     {
         week[i] = week[i - 1].AddDays(1);
     }
     //DayOfWeek getWeekDay(DateTime date) {
-        //DayOfWeek weekDay = date.DayOfWeek;
-        //return weekDay;
-        //}
+    //DayOfWeek weekDay = date.DayOfWeek;
+    //return weekDay;
+    //}
 }
 <div class="row mx-0">
     @for (var weekDay = 0; weekDay < 7; weekDay++)
     {
-            <div class="col px-1">
-                <div class="border-bottom border-secondary px-1">
-                    @if (today == week[weekDay])
-                    {
-                        <h5 class="text-right">@now.ToString("m")</h5>
-                        <h6 class="text-right">@weekDays[weekDay]</h6>
-                    }
-                    else
-                    {
-                        <h5 class="text-right text-secondary">@week[weekDay].ToString("m")</h5>
-                        <h6 class="text-right text-secondary">@weekDays[weekDay]</h6>
-                    }
-                    
-                    @*@if (today == week[weekDay])
+        <div class="col px-1">
+            <div class="border-bottom border-secondary px-1">
+                @if (today == week[weekDay])
+                {
+                    <h5 class="text-right">@now.ToString("m")</h5>
+                    <h6 class="text-right">@weekDays[weekDay]</h6>
+                }
+                else
+                {
+                    <h5 class="text-right text-secondary">@week[weekDay].ToString("m")</h5>
+                    <h6 class="text-right text-secondary">@weekDays[weekDay]</h6>
+                }
+
+                @*@if (today == week[weekDay])
                     {
                         <p class="font-weight-bold">@weekDays[weekDay], @now.ToString("m")</p>
-                            
+
                     }
                     else
                     {
                         <p class="font-weight-bold">@weekDays[weekDay], @week[weekDay].ToString("m")</p>
-                            
+
                     }*@
-                </div>
-                <div class="px-2">
-                    @foreach (var item in events)
-                    {
-                        @if (item.DeadlineTime.ToString("MM/dd/yyyy") == week[weekDay].ToString("MM/dd/yyyy"))
-                        {
-                            <MiniEvent item="@item" DeleteEvent="@DeleteEvent"/>
-                        }
-                    }
-                </div>
             </div>
+            <div class="px-2">
+                @foreach (var item in events)
+                {
+                    @if (item.DeadlineTime.ToString("MM/dd/yyyy") == week[weekDay].ToString("MM/dd/yyyy"))
+                    {
+                        <MiniEvent item="@item" DeleteEvent="@DeleteEvent" />
+                    }
+                }
+            </div>
+        </div>
     }
-    
 </div>
 
-@code {
+@code
+{
     private bool CollapseModal = false;
 
     private void ToggleModal()
@@ -92,16 +91,16 @@
         CollapseModal = !CollapseModal;
     }
 
-    private IEnumerable<Event> events = new List<Event>();
+    [Parameter]
+    public List<Event> events { get; set; }
 
     protected override void OnInitialized()
     {
-        events = EventService.GetAllEvents();
+        events = _eventController.GetUserEvents();
     }
-
 
     private void DeleteEvent(int Id)
     {
-            EventService.DeleteEvent(Id);
+        _eventController.DeleteEvent(Id);
     }
 }
