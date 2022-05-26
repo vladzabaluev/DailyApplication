@@ -2,3 +2,7 @@
     /* Never collapse the sidebar for wide screens */
     display: block;
 }
+
+.no-collapse {
+    display: none;
+}

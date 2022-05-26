@@ -5,7 +5,11 @@
 @inject DailyApplication.Controllers.EventsController EventService;
 
 <h1>События</h1>
-<a class="btn btn-outline-dark mt-1 mb-3" role="button" href="/events/create">Создать</a>
+<Modal Collapse="@CollapseModal" Toggle="@ToggleModal">
+    <Create Toggle="@ToggleModal"/>
+</Modal>
+
+<button class="btn btn-outline-dark mt-1 mb-3" @onclick=ToggleModal>Создать</button>
 @{
     string[] weekDays = { "Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб" };
     DateTime now = DateTime.Now;
@@ -81,29 +85,23 @@
 </div>
 
 @code {
-    
+    private bool CollapseModal = false;
+
+    private void ToggleModal()
+    {
+        CollapseModal = !CollapseModal;
+    }
 
     private IEnumerable<Event> events = new List<Event>();
-
-    //protected async override Task OnInitializedAsync()
-    //{
-    //    //await _context.Event.ToListAsync();
-    //}
 
     protected override void OnInitialized()
     {
         events = EventService.GetAllEvents();
     }
 
-    //public async Task<IActionResult> Index()
-    //{
-    //await _context.Event.ToListAsync();
-    //}
-
 
     private void DeleteEvent(int Id)
     {
-
             EventService.DeleteEvent(Id);
     }
 }

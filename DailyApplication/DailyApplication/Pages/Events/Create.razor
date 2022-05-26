@@ -1,6 +1,4 @@
-﻿@page "/events/create"
-
-@inject DailyApplication.Controllers.EventsController EventService;
+﻿@inject DailyApplication.Controllers.EventsController EventService;
 
 <h1>Create</h1>
 
@@ -39,6 +37,9 @@
 </div>
 
 @code {
+    [Parameter]
+    public EventCallback Toggle { get; set; }
+
     private string eventName;
     private string eventDescription;
     private DateTime eventDeadline = DateTime.Now;
