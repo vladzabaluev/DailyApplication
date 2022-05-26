@@ -2,6 +2,7 @@
 
 @using System.Globalization;
 @using Microsoft.VisualBasic;
+@using System.Security.Claims
 @inject DailyApplication.Controllers.EventsController _eventController;
 
 <h1>События</h1>
@@ -37,10 +38,6 @@
     {
         week[i] = week[i - 1].AddDays(1);
     }
-    //DayOfWeek getWeekDay(DateTime date) {
-    //DayOfWeek weekDay = date.DayOfWeek;
-    //return weekDay;
-    //}
 }
 <div class="row mx-0">
     @for (var weekDay = 0; weekDay < 7; weekDay++)
@@ -57,17 +54,6 @@
                     <h5 class="text-right text-secondary">@week[weekDay].ToString("m")</h5>
                     <h6 class="text-right text-secondary">@weekDays[weekDay]</h6>
                 }
-
-                @*@if (today == week[weekDay])
-                    {
-                        <p class="font-weight-bold">@weekDays[weekDay], @now.ToString("m")</p>
-
-                    }
-                    else
-                    {
-                        <p class="font-weight-bold">@weekDays[weekDay], @week[weekDay].ToString("m")</p>
-
-                    }*@
             </div>
             <div class="px-2">
                 @foreach (var item in events)
@@ -84,6 +70,7 @@
 
 @code
 {
+
     private bool CollapseModal = false;
 
     private void ToggleModal()
@@ -91,13 +78,13 @@
         CollapseModal = !CollapseModal;
     }
 
-    [Parameter]
-    public List<Event> events { get; set; }
+    private List<Event> events;
 
     protected override void OnInitialized()
     {
-        events = _eventController.GetUserEvents();
+        events = _eventController.GetAllEvents();
     }
+
 
     private void DeleteEvent(int Id)
     {

@@ -54,11 +54,13 @@
 
         if (!string.IsNullOrWhiteSpace(eventName))
         {
-            _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline);
+             _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline);
 
             eventName = string.Empty;
             eventDescription = string.Empty;
             eventDeadline = DateTime.Now;
+            
         }
+        
     }
 }

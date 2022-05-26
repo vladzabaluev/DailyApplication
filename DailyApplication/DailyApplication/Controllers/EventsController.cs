@@ -24,8 +24,8 @@ namespace DailyApplication.Controllers
             _context = context;
             _userManager = userManager;
         }
-
-        // Созда событие (сделать асинхронным)
+        #region Создать ивент
+        //Созда событие(сделать асинхронным)
         public void CreateEvent(string Name, string Description, ClaimsPrincipal User, DateTime DeadlineTime)
         {
             Event newEvent = new Event()
@@ -40,55 +40,68 @@ namespace DailyApplication.Controllers
             _context.SaveChanges();
         }
 
-        // Чтение всех ивентов
-        //public IEnumerable<Event> Index()
+        //[Authorize]
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //POST: Create
+        //public async Task<IActionResult> CreateEvent(string Name, string Description, ClaimsPrincipal User, DateTime DeadlineTime)
         //{
-        //    return _context.Event;
+        //    if (ModelState.IsValid)
+        //    {
+        //        Event newEvent = new Event()
+        //        {
+        //            Name = Name,
+        //            Description = Description,
+        //            User = _userManager.GetUserAsync(User).Result,
+        //            DeadlineTime = DeadlineTime,
+        //            IsDone = false
+        //        };
+        //        _context.Event.Add(newEvent);
+        //        await _context.SaveChangesAsync();
+        //        RedirectToPage(nameof(Events));
+        //    }
+        //    return new RedirectToPageResult(nameof(Events));
+        //    //return RedirectToPage("Events");
+
         //}
 
-        //public async Task<> Index()
+        //// GET: Events/Create
+        //[Authorize]
+        //public IActionResult Create()
         //{
-        //    return await _context.Event.ToArrayAsync();
-        //    //await _context.Event.ToListAsync();
-        //    //  return _context.Event.ToListAsync();
-        //    //   return RedirectToPage("Events");// (Pages.Events.Events, await _context.Event.ToListAsync());
+        //    return View();
         //}
+
+        //// POST: Events/Create
+        //// To protect from overposting attacks, enable the specific properties you want to bind to.
+        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //[Authorize]
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Create([Bind("Id,Name,Description,DeadlineTime")] Event @event)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        @event.User = _userManager.GetUserAsync(User).Result;
+        //        @event.IsDone = false;
+        //        _context.Add(@event);
+        //        await _context.SaveChangesAsync();
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    return View(@event);
+        //}
+        #endregion
+
+        #region Вернуть ивенты
         public List<Event> GetAllEvents()
         {
             return _context.Event.ToList();
         }
 
-        public List<Event> GetUserEvents()
-        {
-            return _context.Event.Where(ev => ev.User == _userManager.GetUserAsync(User).Result).ToList();
-        }
-
-        public async Task<IActionResult> Prikol()
-        {
-            return new RedirectToPageResult("Events", new { events = await _context.Event.ToListAsync() });
-        }
-
-        // U
-        public void UpdateEvent(Event changedEvent)
-        {
-            var item = _context.Event.Attach(changedEvent);
-            item.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-
-            _context.SaveChanges();
-        }
-
-        // D
-        public void DeleteEvent(int Id)
-        {
-            var deletedItem = _context.Event.Find(Id);
-
-            if (deletedItem != null)
-            {
-                _context.Event.Remove(deletedItem);
-                _context.SaveChanges();
-            }
-        }
-
+        //public List<Event> GetUserEvents()
+        //{
+        //    return _context.Event.Where(ev => ev.User == _userManager.GetUserAsync(User).Result).ToList();
+        //}
         // GET: Events
         //public async Task<IActionResult> Index()
         //{
@@ -102,8 +115,43 @@ namespace DailyApplication.Controllers
         //        Where(ev => ev.User == _userManager.GetUserAsync(User).Result).ToListAsync());
         //}
 
+        //public async Task<IActionResult> Prikol()
+        //{
+        //    return new RedirectToPageResult("Events", new { events = await _context.Event.ToListAsync() });
+        //}
+
+        // Чтение всех ивентов
+        //public IEnumerable<Event> Index()
+        //{
+        //    return _context.Event;
+        //}
+
+        //public async Task<> Index()
+        //{
+        //    return await _context.Event.ToArrayAsync();
+        //    //await _context.Event.ToListAsync();
+        //    //  return _context.Event.ToListAsync();
+        //    //   return RedirectToPage("Events");// (Pages.Events.Events, await _context.Event.ToListAsync());
+        //}
+        #endregion
+
+        #region Удалить ивент
+
+        // D
+        public void DeleteEvent(int Id)
+        {
+            var deletedItem = _context.Event.Find(Id);
+
+            if (deletedItem != null)
+            {
+                _context.Event.Remove(deletedItem);
+                _context.SaveChanges();
+            }
+        }
+
+        // GET: NewEvents/Delete/5
         [Authorize]
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
@@ -120,49 +168,29 @@ namespace DailyApplication.Controllers
             return View(@event);
         }
 
-        // GET: Events/Create
+        // POST: NewEvents/Delete/5
         [Authorize]
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Events/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [Authorize]
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,DeadlineTime")] Event @event)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (ModelState.IsValid)
-            {
-                @event.User = _userManager.GetUserAsync(User).Result;
-                @event.IsDone = false;
-                _context.Add(@event);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(@event);
-        }
-
-        public async Task<IActionResult> DoneEvent(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            var processEvent = await _context.Event.FindAsync(id);
-            if (processEvent == null)
-            {
-                return NotFound();
-            }
-            processEvent.IsDone = true;
-            _context.Update(processEvent);
+            var @event = await _context.Event.FindAsync(id);
+            _context.Event.Remove(@event);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(GetUserEvents));
+            return RedirectToAction(nameof(Index));
         }
 
+        #endregion
+
+        #region Обновить события
+        // U
+        public void UpdateEvent(Event changedEvent)
+        {
+            var item = _context.Event.Attach(changedEvent);
+            item.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+
+            _context.SaveChanges();
+        }
         // GET: NewEvents/Edit/5
         [Authorize]
         public async Task<IActionResult> Edit(int? id)
@@ -215,10 +243,31 @@ namespace DailyApplication.Controllers
             }
             return View(@event);
         }
+        #endregion
 
-        // GET: NewEvents/Delete/5
+        #region Выполнить событие
+        public async Task<IActionResult> DoneEvent(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var processEvent = await _context.Event.FindAsync(id);
+            if (processEvent == null)
+            {
+                return NotFound();
+            }
+            processEvent.IsDone = true;
+            _context.Update(processEvent);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(GetAllEvents));
+        }
+
+        #endregion
+
+        #region Подробнее о событии
         [Authorize]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
@@ -235,18 +284,9 @@ namespace DailyApplication.Controllers
             return View(@event);
         }
 
-        // POST: NewEvents/Delete/5
-        [Authorize]
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var @event = await _context.Event.FindAsync(id);
-            _context.Event.Remove(@event);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+        #endregion
 
+      
         private bool EventExists(int id)
         {
             return _context.Event.Any(e => e.Id == id);
