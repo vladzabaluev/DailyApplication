@@ -8,7 +8,7 @@
             </h5>
         </div>
         <div class="col-3 d-flex align-self-center px-0 justify-content-end">
-            <button class="@DelBtnClass text-right btn btn-outline-dark px-2 py-0" @onclick="@(() => DeleteEvent.InvokeAsync(item.Id))">X</button>
+            <button class="@DelBtnClass text-right btn btn-outline-dark px-2 py-0" @onclick="@(() => DeleteEvent.InvokeAsync(item))">X</button>
         </div>
     </div>
 </div>
@@ -28,5 +28,5 @@
     }
 
     [Parameter]
-    public EventCallback<int> DeleteEvent { get; set; }
+    public EventCallback<Event> DeleteEvent { get; set; }
 }

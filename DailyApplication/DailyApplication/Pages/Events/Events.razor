@@ -1,4 +1,4 @@
-﻿@page "/Events"
+﻿@page "/events"
 
 @using System.Globalization;
 @using Microsoft.VisualBasic;
@@ -7,7 +7,7 @@
 
 <h1>События</h1>
 <Modal Collapse="@CollapseModal" Toggle="@ToggleModal">
-    <Create Toggle="@ToggleModal" />
+    <Create Toggle="@ToggleModal" CreateEvent="@CreateEvent"/>
 </Modal>
 <button class="btn btn-outline-dark mt-1 mb-3" @onclick=ToggleModal>Создать</button>
 @{
@@ -91,8 +91,14 @@
     }
 
 
-    private void DeleteEvent(int Id)
+    private void DeleteEvent(Event deletedEvent)
     {
-        _eventController.DeleteEvent(Id);
+        _eventController.DeleteEvent(deletedEvent.Id);
+        events.Remove(deletedEvent);
+    }
+
+    private void CreateEvent (Event newEvent)
+    {
+        events.Add(newEvent);
     }
 }
