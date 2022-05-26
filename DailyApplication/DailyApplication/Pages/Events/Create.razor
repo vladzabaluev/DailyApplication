@@ -25,7 +25,23 @@
                 <span class="text-danger"></span>
             </div>
             <div class="form-group">
+                @currentString
+            </div>
+            <div class="form-group">
+                <label class="control-label"></label>
+                <input class="form-control" placeholder="Название" @onchange="((ChangeEventArgs __e)=> { currentString = __e.Value.ToString();
+                                                                                  tempArr.Add(currentString);
+                                                                              })" />
+                <span class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <input type="submit" value="Создать" class="btn btn-primary" @onclick=AddEvent />
+            </div>
+            <div class="form-group">
+                @foreach(var str in tempArr)
+            {
+                <p>@str</p>
+            }
             </div>
         </form>
     </div>
@@ -38,6 +54,8 @@
 </div>
 
 @code {
+    public string currentString;
+    List<string> tempArr = new List<string>();
     [Parameter]
     public EventCallback Toggle { get; set; }
     [CascadingParameter]
@@ -54,13 +72,13 @@
 
         if (!string.IsNullOrWhiteSpace(eventName))
         {
-             _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline);
+            _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline);
 
             eventName = string.Empty;
             eventDescription = string.Empty;
             eventDeadline = DateTime.Now;
-            
+
         }
-        
+
     }
 }

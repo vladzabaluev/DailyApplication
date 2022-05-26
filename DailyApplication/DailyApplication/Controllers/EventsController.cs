@@ -141,49 +141,69 @@ namespace DailyApplication.Controllers
         //}
         #endregion
 
-        #region Удалить ивент
+        #region Удалить события
 
         // D
-        public void DeleteEvent(int Id)
-        {
-            var deletedItem = _context.Event.Find(Id);
+        //public void DeleteEvent(int? id)
+        //{
 
-            if (deletedItem != null)
-            {
-                _context.Event.Remove(deletedItem);
-                _context.SaveChanges();
-            }
-        }
+        //    var deletedItem = _context.Event.Find(Id);
 
-        // GET: NewEvents/Delete/5
+        //    if (deletedItem != null)
+        //    {
+        //        _context.Event.Remove(deletedItem);
+        //        _context.SaveChanges();
+        //    }
+        //}
+        //// GET: NewEvents/Delete/5
+        //[Authorize]
+        //public async Task<IActionResult> Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var @event = await _context.Event
+        //        .FirstOrDefaultAsync(m => m.Id == id);
+        //    if (@event == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return View(@event);
+        //}
+
+        //// POST: NewEvents/Delete/5
+        //[Authorize]
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteConfirmed(int id)
+        //{
+        //    var @event = await _context.Event.FindAsync(id);
+        //    _context.Event.Remove(@event);
+        //    await _context.SaveChangesAsync();
+        //    return RedirectToAction(nameof(Index));
+        //}
+
         [Authorize]
-        public async Task<IActionResult> Delete(int? id)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteEvent(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
-            var @event = await _context.Event
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (@event == null)
+            var removableEvent = await _context.Event.FirstOrDefaultAsync(curEv => curEv.Id == id);
+            if (removableEvent == null)
             {
                 return NotFound();
             }
 
-            return View(@event);
-        }
-
-        // POST: NewEvents/Delete/5
-        [Authorize]
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var @event = await _context.Event.FindAsync(id);
-            _context.Event.Remove(@event);
+            _context.Event.Remove(removableEvent);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(GetUserEvents));
         }
 
         #endregion
@@ -252,13 +272,17 @@ namespace DailyApplication.Controllers
         #endregion
 
         #region Выполнить событие
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DoneEvent(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-            var processEvent = await _context.Event.FindAsync(id);
+            var processEvent = await _context.Event.FirstOrDefaultAsync(procEv => procEv.Id==id);
             if (processEvent == null)
             {
                 return NotFound();
@@ -266,29 +290,12 @@ namespace DailyApplication.Controllers
             processEvent.IsDone = true;
             _context.Update(processEvent);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(GetAllEvents));
+            return RedirectToAction(nameof(GetUserEvents));
         }
 
         #endregion
 
-        #region Подробнее о событии
-        [Authorize]
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var @event = await _context.Event
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (@event == null)
-            {
-                return NotFound();
-            }
-
-            return View(@event);
-        }
+        #region Подробнее о событии 
 
         #endregion
 
