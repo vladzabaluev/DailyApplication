@@ -91,10 +91,10 @@
     }
 
 
-    private void DeleteEvent(Event deletedEvent)
+    private async void DeleteEvent(Event deletedEvent)
     {
-        _eventController.DeleteEvent(deletedEvent.Id);
         events.Remove(deletedEvent);
+        await _eventController.DeleteEvent(deletedEvent.Id);
     }
 
     private void CreateEvent (Event newEvent)
