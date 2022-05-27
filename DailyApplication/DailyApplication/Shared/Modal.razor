@@ -1,5 +1,5 @@
-﻿<div class="modal mt-5" tabindex="-1" role="dialog" style="display:@Display;" @onclick=Toggle>
-    <div class="modal-dialog" role="document" @onclick:stopPropagation>
+﻿<div class="modal mt-5" tabindex="-1" role="dialog" style="display:@Display;" @onmousedown=Toggle>
+    <div class="modal-dialog" role="document" @onmousedown:stopPropagation>
         <div class="modal-content" style="min-width:600px;">
             @ChildContent
         </div>
