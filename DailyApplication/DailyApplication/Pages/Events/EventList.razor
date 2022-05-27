@@ -9,8 +9,6 @@
 <Modal Collapse="@CollapseModalCreate" Toggle="@ToggleModalCreate">
     <CreateEvent Toggle="@ToggleModalCreate" Create="@CreateEvent"/>
 </Modal>
-<Modal Collapse="@CollapseModalOpen" Toggle="@ToggleModalOpen">
-</Modal>
 <button class="btn btn-outline-dark mt-1 mb-3" @onclick=ToggleModalCreate>Создать</button>
 @{
     string[] weekDays = { "Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб" };
@@ -62,9 +60,7 @@
                 {
                     @if (item.DeadlineTime.ToString("MM/dd/yyyy") == week[weekDay].ToString("MM/dd/yyyy"))
                     {
-                        <div>
-                            <EventBox item="@item" DeleteEvent="@DeleteEvent" />
-                        </div>
+                        <EventBox Item="@item" DeleteEvent="@DeleteEvent" />
                     }
                 }
             </div>
@@ -100,15 +96,6 @@
         ClaimsPrincipal currentUser = currentAuth.User;
 
         events = _eventController.GetUserEvents(currentUser);
-    }
-    #endregion
-    
-    #region Просмотр события
-    private bool CollapseModalOpen = false;
-
-    private void ToggleModalOpen()
-    {
-        CollapseModalOpen = !CollapseModalOpen;
     }
     #endregion
     

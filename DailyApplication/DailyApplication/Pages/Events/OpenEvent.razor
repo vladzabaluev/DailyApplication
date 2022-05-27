@@ -1,84 +1,60 @@
 ﻿@inject DailyApplication.Controllers.EventsController _eventController;
 @using System.Security.Claims
 
-<h4>Event</h4>
-<hr />
-<form>
-    <div class="text-danger"></div>
-    <div class="form-group">
-        <label class="control-label"></label>
-        <input class="form-control" placeholder="Название" @bind=eventName />
-        <span class="text-danger"></span>
+<div class="modal-header">
+    <h5 class="modal-title">@Item.DeadlineTime.ToString("f")</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick=Toggle>
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <h5 class="modal-title">@Item.Name</h5>
+    <div class="my-1">
+        @if(Item.Description != null)
+        {
+            <p class="card-text">
+                @Item.Description
+            </p>
+        }
+        else
+        {
+            <p class="card-text">
+                Нет описания
+            </p>
+        }
     </div>
-    <div class="form-group">
-        <label class="control-label"></label>
-        <input type="textarea" class="form-control" placeholder="Описание" @bind=eventDescription />
-        <span class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label class="control-label"></label>
-        <input @bind:format="yyyy-MM-ddTHH:mm" type="datetime-local" class="form-control" placeholder="Время окончания" @bind=eventDeadline />
-        <span class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        @currentString
-    </div>
-    <div class="form-group">
-        <label class="control-label"></label>
-        <input class="form-control" placeholder="Название" @onchange="((ChangeEventArgs __e)=> { currentString = __e.Value.ToString();
-                                                                            tempArr.Add(currentString);
-                                                                        })" />
-        <span class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <input type="submit" value="Создать" class="btn btn-primary" @onclick=AddEvent />
-    </div>
-    <div class="form-group">
-        @foreach(var str in tempArr)
-    {
-        <p>@str</p>
-    }
-    </div>
-</form>
-
-<div>
-    <NavLink class="" href="events">
-        Back to List
-    </NavLink>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick=Toggle>Close</button>
 </div>
 
 @code {
-    public string currentString;
-    List<string> tempArr = new List<string>();
+    [Parameter]
+    public Event Item { get; set; }
+
     [Parameter]
     public EventCallback Toggle { get; set; }
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    private string eventName;
-    private string eventDescription;
-    private DateTime eventDeadline = DateTime.Now;
+    //[Parameter]
+    //public EventCallback<Event> CreateEvent { get; set; }
 
-    [Parameter]
-    public EventCallback<Event> CreateEvent { get; set; }
+    //private async void AddEvent()
+    //{
+    //    AuthenticationState currentAuth = await authenticationStateTask;
+    //    ClaimsPrincipal currentUser = currentAuth.User;
 
-    private async void AddEvent()
-    {
-        AuthenticationState currentAuth = await authenticationStateTask;
-        ClaimsPrincipal currentUser = currentAuth.User;
+    //    if (!string.IsNullOrWhiteSpace(eventName))
+    //    {
+    //        _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline);
 
-        if (!string.IsNullOrWhiteSpace(eventName))
-        {
-            _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline);
+    //        eventName = string.Empty;
+    //        eventDescription = string.Empty;
+    //        eventDeadline = DateTime.Now;
 
-            eventName = string.Empty;
-            eventDescription = string.Empty;
-            eventDeadline = DateTime.Now;
+    //        Event newEvent = new Event() { Name = eventName, Description = eventDescription, DeadlineTime = eventDeadline, IsDone = false };
 
-            Event newEvent = new Event() { Name = eventName, Description = eventDescription, DeadlineTime = eventDeadline, IsDone = false };
+    //        await CreateEvent.InvokeAsync(newEvent);
+    //    }
 
-            await CreateEvent.InvokeAsync(newEvent);
-        }
-
-    }
+    //}
 }
