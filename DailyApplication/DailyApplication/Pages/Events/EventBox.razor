@@ -5,12 +5,12 @@
 </Modal>
 <div class="container border-top" @onmouseover=ToggleDelBtn @onmouseout=ToggleDelBtn>
     <div class="row">
-        <div class="col-9" @onclick="ToggleModalOpen">
-            <h5 class="py-1">
+        <div class="col-10 px-0" @onclick="ToggleModalOpen">
+            <h5 class="py-2 overflow-hidden m-0">
                 @Item.Name
             </h5>
         </div>
-        <div class="col-3 d-flex align-self-center px-0 justify-content-end">
+        <div class="col-2 d-flex align-self-center px-0 justify-content-end">
             <button class="@DelBtnClass text-right btn btn-outline-dark px-2 py-0" @onclick="@(() => DeleteEvent.InvokeAsync(Item))">X</button>
         </div>
     </div>
