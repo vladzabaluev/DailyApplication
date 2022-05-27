@@ -62,7 +62,7 @@
                 {
                     @if (item.DeadlineTime.ToString("MM/dd/yyyy") == week[weekDay].ToString("MM/dd/yyyy"))
                     {
-                        <div @onclick="ToggleModalOpen">
+                        <div>
                             <EventBox item="@item" DeleteEvent="@DeleteEvent" />
                         </div>
                     }
