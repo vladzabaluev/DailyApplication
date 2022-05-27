@@ -1,0 +1,62 @@
+﻿@inject DailyApplication.Controllers.EventsController _eventController;
+
+<div class="col px-1 overflow-hidden" style="width:14.28%; height: 65vh;" @onmouseover=ToggleCreateBtn @onmouseout=ToggleCreateBtn>
+    <div class="border-bottom border-secondary px-1">
+        @if (today == week[weekDay])
+        {
+            <h5 class="text-right">@today.ToString("m")</h5>
+            <h6 class="text-right">@weekDays[weekDay]</h6>
+        }
+        else
+        {
+            <h5 class="text-right text-secondary">@week[weekDay].ToString("m")</h5>
+            <h6 class="text-right text-secondary">@weekDays[weekDay]</h6>
+        }
+    </div>
+    <div class="px-2 h-100">
+        @foreach (var item in events)
+        {
+            @if (item.DeadlineTime.ToString("MM/dd/yyyy") == week[weekDay].ToString("MM/dd/yyyy"))
+            {
+                <EventBox Item="@item" DeleteEvent="@DeleteEvent" />
+            }
+        }
+        <OnHoverBox collapseHover=@collapseCreateHover>
+            <div class="d-inline-block justify-content-center w-100 h-100">
+                <button class="btn btn-outline-light mt-1 mb-3 w-100 h-100" @onclick="@(() => OpenCreateBox.InvokeAsync(week[weekDay]))"></button>
+            </div>
+        </OnHoverBox>
+    </div>
+</div>
+
+@code {
+    string[] weekDays = { "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс" };
+    DateTime today = DateTime.Today;
+
+    [Parameter]
+    public List<Event> events { get; set; }
+    
+    [Parameter]
+    public DateTime[] week { get; set; }
+    
+    [Parameter]
+    public EventCallback<DateTime> OpenCreateBox { get; set; }
+    
+    [Parameter]
+    public int weekDay { get; set; }
+
+    private bool collapseCreateHover = true;
+    private void ToggleCreateBtn()
+    {
+        collapseCreateHover = !collapseCreateHover;
+    }
+    
+    #region Удаление события
+    private async void DeleteEvent(Event deletedEvent)
+    {
+        bool isSucceded = events.Remove(deletedEvent);
+        if(isSucceded)
+            await _eventController.DeleteEvent(deletedEvent.Id);
+    }
+    #endregion
+}

@@ -4,7 +4,7 @@
 <form>
     <div class="modal-header">
         <h5 class="modal-title">Создать событие</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick=Toggle>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="@(() => Toggle.InvokeAsync(DateTime.Now))">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
@@ -44,27 +44,39 @@
             </div>
     </div>
     <div class="modal-footer">
-        <div @onclick=Toggle>
+        <div @onclick="@(() => Toggle.InvokeAsync(DateTime.Now))">
             <input type="submit" value="Создать" class="btn btn-primary" @onclick=AddEvent @onclick:preventDefault/>
         </div>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick=Toggle>Закрыть</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@(() => Toggle.InvokeAsync(DateTime.Now))">Закрыть</button>
     </div>
 </form>
 
 @code {
     public string currentString;
     List<string> tempArr = new List<string>();
+
     [Parameter]
-    public EventCallback Toggle { get; set; }
+    public EventCallback<DateTime> Toggle { get; set; }
+
+    [Parameter]
+    public DateTime eventDeadline { get; set; }
+
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     private string eventName;
     private string eventDescription;
-    private DateTime eventDeadline = DateTime.Now;
 
     [Parameter]
     public EventCallback<Event> Create { get; set; }
+
+    //protected override void OnInitialized()
+    //{
+    //    if (eventDeadline == null)
+    //    {
+
+    //    }
+    //}
 
     private async void AddEvent()
     {
@@ -76,6 +88,10 @@
             Event newEvent = _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline);
 
             await Create.InvokeAsync(newEvent);
+
+            eventName = string.Empty;
+            eventDescription = string.Empty;
+            eventDeadline = DateTime.Now;
         }
 
     }

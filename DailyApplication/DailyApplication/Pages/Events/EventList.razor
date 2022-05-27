@@ -6,48 +6,24 @@
 @inject DailyApplication.Controllers.EventsController _eventController;
 
 <h1>События</h1>
-<Modal Collapse="@CollapseModalCreate" Toggle="@ToggleModalCreate">
-    <CreateEvent Toggle="@ToggleModalCreate" Create="@CreateEvent"/>
+<Modal Collapse="@CollapseModalCreate" Toggle="@(() => ToggleModalCreate(DateTime.Now))">
+    <CreateEvent Toggle="@(() => ToggleModalCreate(DateTime.Now))" Create="@CreateEvent" eventDeadline="@CreateDeadlineTime"/>
 </Modal>
 <div class="d-flex justify-content-between">
-    <button class="btn btn-outline-dark mt-1 mb-3" @onclick=ToggleModalCreate>Создать</button>
+    <button class="btn btn-outline-dark mt-1 mb-3" @onclick="@(() => ToggleModalCreate(DateTime.Now))">Создать</button>
     <DateSelector Week="@week" IncrementWeek="@InWeek" DecrementWeek="@DeWeek"/>
 </div>
 
 <div class="row mx-0">
-    @for (var weekDay = 0; weekDay < 7; weekDay++)
+    @for (int weekDay = 0; weekDay < 7; weekDay++)
     {
-        <div class="col px-1" style="width:14.28%">
-            <div class="border-bottom border-secondary px-1">
-                @if (today == week[weekDay])
-                {
-                    <h5 class="text-right">@today.ToString("m")</h5>
-                    <h6 class="text-right">@weekDays[weekDay]</h6>
-                }
-                else
-                {
-                    <h5 class="text-right text-secondary">@week[weekDay].ToString("m")</h5>
-                    <h6 class="text-right text-secondary">@weekDays[weekDay]</h6>
-                }
-            </div>
-            <div class="px-2">
-                @foreach (var item in events)
-                {
-                    @if (item.DeadlineTime.ToString("MM/dd/yyyy") == week[weekDay].ToString("MM/dd/yyyy"))
-                    {
-                        <EventBox Item="@item" DeleteEvent="@DeleteEvent" />
-                    }
-                }
-            </div>
-        </div>
+        <EventDayList events=@events week=@week weekDay=@weekDay OpenCreateBox=@ToggleModalCreate/>
     }
 </div>
 
 @code
 {
-    string[] weekDays = { "Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс" };
     DateTime[] week = new DateTime[7];
-    DateTime today = DateTime.Today;
     CultureInfo myCI = new CultureInfo("en-US");
     protected override void OnInitialized()
     {
@@ -79,14 +55,14 @@
         }
         return week;
     }
-    
+
     #region Селектор недель
 
     void InWeek()
     {
         week = weekInit(myCI.Calendar.AddWeeks(week[0], + 1));
     }
-    
+
     void DeWeek ()
     {
         week = weekInit(myCI.Calendar.AddWeeks(week[0], - 1));
@@ -95,12 +71,14 @@
 
     #region Создание события
     private bool CollapseModalCreate = false;
+    private DateTime CreateDeadlineTime;
 
-    private void ToggleModalCreate()
+    private void ToggleModalCreate(DateTime DeadlineTime)
     {
+        CreateDeadlineTime = DeadlineTime;
         CollapseModalCreate = !CollapseModalCreate;
     }
-    
+
     private void CreateEvent (Event newEvent)
     {
         events.Add(newEvent);
@@ -119,15 +97,6 @@
         ClaimsPrincipal currentUser = currentAuth.User;
 
         events = _eventController.GetUserEvents(currentUser);
-    }
-    #endregion
-    
-    #region Удаление события
-    private async void DeleteEvent(Event deletedEvent)
-    {
-        bool isSucceded = events.Remove(deletedEvent);
-        if(isSucceded)
-            await _eventController.DeleteEvent(deletedEvent.Id);
     }
     #endregion
 }
