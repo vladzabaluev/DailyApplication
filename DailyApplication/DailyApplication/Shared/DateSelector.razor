@@ -1,0 +1,18 @@
+﻿<div class="d-flex align-content-center">
+    <span class="alert alert-secondary mt-1 mb-3 p-0">
+        <button class="btn btn-outline-dark px-1" @onclick=DecrementWeek>⯇</button>
+        <span class="mx-2"> @Week[0].ToString("m") - @Week[6].ToString("m") </span>
+        <button class="btn btn-outline-dark px-1" @onclick=IncrementWeek>⯈</button>
+    </span>
+</div>
+
+@code {
+    [Parameter]
+    public DateTime[] Week { get; set; }
+    
+    [Parameter]
+    public EventCallback DecrementWeek { get; set; }
+    
+    [Parameter]
+    public EventCallback IncrementWeek { get; set; }
+}

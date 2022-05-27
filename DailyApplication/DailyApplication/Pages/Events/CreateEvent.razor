@@ -45,7 +45,7 @@
     </div>
     <div class="modal-footer">
         <div @onclick=Toggle>
-            <input type="submit" value="Создать" class="btn btn-primary" @onclick=AddEvent />
+            <input type="submit" value="Создать" class="btn btn-primary" @onclick=AddEvent @onclick:preventDefault/>
         </div>
         <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick=Toggle>Закрыть</button>
     </div>
@@ -73,13 +73,7 @@
 
         if (!string.IsNullOrWhiteSpace(eventName))
         {
-            _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline);
-
-            eventName = string.Empty;
-            eventDescription = string.Empty;
-            eventDeadline = DateTime.Now;
-
-            Event newEvent = new Event() { Name = eventName, Description = eventDescription, DeadlineTime = eventDeadline, IsDone = false };
+            Event newEvent = _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline);
 
             await Create.InvokeAsync(newEvent);
         }

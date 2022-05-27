@@ -26,7 +26,7 @@ namespace DailyApplication.Controllers
         }
         #region Создать ивент
         //Созда событие(сделать асинхронным)
-        public void CreateEvent(string Name, string Description, ClaimsPrincipal User, DateTime DeadlineTime)
+        public Event CreateEvent(string Name, string Description, ClaimsPrincipal User, DateTime DeadlineTime)
         {
             Event newEvent = new Event()
             {
@@ -38,6 +38,7 @@ namespace DailyApplication.Controllers
             };
             _context.Event.Add(newEvent);
             _context.SaveChanges();
+            return newEvent;
         }
 
         //[Authorize]
