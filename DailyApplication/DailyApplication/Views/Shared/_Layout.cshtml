@@ -10,7 +10,7 @@
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container" style="max-width:80%;">
+            <div class="container px-0" style="max-width:80%;">
                 <a class="navbar-brand" href="/">DailyApplication</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
@@ -21,11 +21,11 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" href="/events">Events</a>
+                                <a class="nav-link text-dark" href="/events">События</a>
                             </li>
                         }
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="/privacy">Privacy</a>
+                            <a class="nav-link text-dark" href="/about">О сайте</a>
                         </li>
                     </ul>
                     <partial name="_LoginPartial" />
@@ -41,7 +41,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container" style="max-width:80%;">
-            &copy; 2022 - DailyApplication - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2022 - DailyApplication - <a  href="/about">О сайте</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

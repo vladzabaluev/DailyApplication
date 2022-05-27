@@ -6,3 +6,8 @@
 .no-collapse {
     display: none;
 }
+
+.event {
+    background: black;
+    color: red;
+}
