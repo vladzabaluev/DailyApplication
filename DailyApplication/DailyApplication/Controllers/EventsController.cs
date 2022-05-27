@@ -102,7 +102,9 @@ namespace DailyApplication.Controllers
         [ValidateAntiForgeryToken]
         public List<Event> GetUserEvents(ClaimsPrincipal user)
         {
-            return _context.Event.Where(ev => ev.User == _userManager.GetUserAsync(user).Result).ToList();
+            List<Event> events = _context.Event.Where(ev => ev.User == _userManager.GetUserAsync(user).Result).ToList();
+            events.Sort((Event x, Event y) => x.DeadlineTime.CompareTo(y.DeadlineTime));
+            return events;
         }
         //public List<Event> GetUserEvents()
         //{
