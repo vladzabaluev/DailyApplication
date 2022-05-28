@@ -11,6 +11,8 @@ namespace DailyApplication.Models
         public string Description { get; set; }
         public bool isDone { get; set; }
 
+        public Event Event { get; set; }
+
         public Sub_event()
         {
         }

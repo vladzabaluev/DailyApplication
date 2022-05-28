@@ -162,11 +162,34 @@ namespace DailyApplication.Controllers
         [ValidateAntiForgeryToken]
         public List<Sub_event> GetEventSubEvents(int Id)
         {
-            Event curEv = _context.Event.FirstOrDefault(ev=>ev.Id==Id);
-            return curEv.SubEvents;
-          //  List<Sub_event> curSubEvents = _context.Sub_event.Where(curSub => curSub.Id == curEv.SubEvents.All(Sub_event, ));
+            Event curEv = _context.Event.FirstOrDefault(ev => ev.Id == Id);
+            List<Sub_event> curSubEvents = _context.Sub_event.Where(curSub => curSub.Event.Id == Id).ToList();
+            return curSubEvents;
         }
         #endregion
+
+        #region Удалить подсобытие
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteEventSubEvents(int Id)
+        {
+            Sub_event removableSubEvent = await _context.Sub_event.FirstOrDefaultAsync(remSubEv => remSubEv.Id == Id);
+            if (removableSubEvent == null)
+            {
+                return NotFound();
+            }
+            _context.Sub_event.Remove(removableSubEvent);
+            //List<Sub_event> removableSubEvents=GetEventSubEvents(removableEvent.Id);
+            //foreach(Sub_event sub_Event in removableSubEvents)
+            //{
+            //    Sub_event currentRemSubEvent = _context.Sub_event.FirstOrDefault(remSubEv => remSubEv.Id == sub_Event.Id);
+            //    _context.Sub_event.Remove(currentRemSubEvent);
+            //}
+            return new RedirectToPageResult(nameof(GetUserEvents));
+        }
+        #endregion
+
         #region Удалить события
 
         // D
@@ -221,13 +244,21 @@ namespace DailyApplication.Controllers
             {
                 return NotFound();
             }
-            var removableEvent = await _context.Event.FirstOrDefaultAsync(curEv => curEv.Id == id);
+            Event removableEvent = await _context.Event.FirstOrDefaultAsync(curEv => curEv.Id == id);
             if (removableEvent == null)
             {
                 return NotFound();
             }
 
+            //List<Sub_event> removableSubEvents=GetEventSubEvents(removableEvent.Id);
+            //foreach(Sub_event sub_Event in removableSubEvents)
+            //{
+            //    Sub_event currentRemSubEvent = _context.Sub_event.FirstOrDefault(remSubEv => remSubEv.Id == sub_Event.Id);
+            //    _context.Sub_event.Remove(currentRemSubEvent);
+            //}
             _context.Event.Remove(removableEvent);
+
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(GetUserEvents));
         }
