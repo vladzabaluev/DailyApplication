@@ -26,14 +26,27 @@ namespace DailyApplication.Controllers
         }
         #region Создать ивент
         //Созда событие(сделать асинхронным)
-        public void CreateEvent(string Name, string Description, ClaimsPrincipal User, DateTime DeadlineTime)
+        public void CreateEvent(string Name, string Description, ClaimsPrincipal User, DateTime DeadlineTime, List<string> subEvents)
         {
+            List<Sub_event> tempSubEv = new List<Sub_event>();
+            foreach(string descValue in subEvents)
+            {
+                Sub_event createdSubEvent = new Sub_event()
+                {
+                    Description = descValue,
+                    isDone = false
+                };
+                tempSubEv.Add(createdSubEvent);
+            }
+
             Event newEvent = new Event()
             {
                 Name = Name,
                 Description = Description,
                 User = _userManager.GetUserAsync(User).Result,
                 DeadlineTime = DeadlineTime,
+                
+                SubEvents = tempSubEv,
                 IsDone = false
             };
             _context.Event.Add(newEvent);
@@ -143,6 +156,17 @@ namespace DailyApplication.Controllers
         //}
         #endregion
 
+        #region Получить подсобытия
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public List<Sub_event> GetEventSubEvents(int Id)
+        {
+            Event curEv = _context.Event.FirstOrDefault(ev=>ev.Id==Id);
+            return curEv.SubEvents;
+          //  List<Sub_event> curSubEvents = _context.Sub_event.Where(curSub => curSub.Id == curEv.SubEvents.All(Sub_event, ));
+        }
+        #endregion
         #region Удалить события
 
         // D

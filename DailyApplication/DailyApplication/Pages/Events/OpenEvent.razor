@@ -10,7 +10,7 @@
 <div class="modal-body">
     <h5 class="modal-title">@Item.Name</h5>
     <div class="my-1">
-        @if(Item.Description != null)
+        @if (Item.Description != null)
         {
             <p class="card-text">
                 @Item.Description
@@ -34,6 +34,15 @@
 
     [Parameter]
     public EventCallback Toggle { get; set; }
+
+
+    public List<Sub_event> Item_subs { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (_eventController.GetEventSubEvents(Item.Id)!=null)
+            Item_subs =  _eventController.GetEventSubEvents(Item.Id);
+    }
 
     //[Parameter]
     //public EventCallback<Event> CreateEvent { get; set; }
