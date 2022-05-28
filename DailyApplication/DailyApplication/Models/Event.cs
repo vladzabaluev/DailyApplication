@@ -20,6 +20,8 @@ namespace DailyApplication.Models
 
         public bool IsDone { get; set; }
 
+        public virtual List<Sub_event> SubEvents { get; set; }
+
         public Event()
         {
         }

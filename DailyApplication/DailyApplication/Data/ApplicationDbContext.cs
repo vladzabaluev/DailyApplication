@@ -15,5 +15,7 @@ namespace DailyApplication.Data
         }
 
         public DbSet<DailyApplication.Models.Event> Event { get; set; }
+
+        public DbSet<DailyApplication.Models.Sub_event> Sub_event { get; set; }
     }
 }

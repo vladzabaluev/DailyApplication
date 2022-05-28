@@ -85,8 +85,8 @@
 
         if (!string.IsNullOrWhiteSpace(eventName))
         {
-            Event newEvent = _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline);
-
+            Event newEvent = _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline, tempArr);
+            
             await Create.InvokeAsync(newEvent);
 
             eventName = string.Empty;

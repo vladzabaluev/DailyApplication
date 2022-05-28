@@ -4,14 +4,16 @@ using DailyApplication.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DailyApplication.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220527135528_AddSubEvents")]
+    partial class AddSubEvents
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -282,11 +284,9 @@ namespace DailyApplication.Data.Migrations
 
             modelBuilder.Entity("DailyApplication.Models.Sub_event", b =>
                 {
-                    b.HasOne("DailyApplication.Models.Event", "Event")
+                    b.HasOne("DailyApplication.Models.Event", null)
                         .WithMany("SubEvents")
                         .HasForeignKey("EventId");
-
-                    b.Navigation("Event");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
