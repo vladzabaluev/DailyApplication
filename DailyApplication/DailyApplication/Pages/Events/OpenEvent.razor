@@ -43,8 +43,8 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick=Toggle>Изменить</button>
-    <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick=Toggle>Удалить</button>
+    <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="(() => Change(Item))">Изменить</button>
+    <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="(() => Delete.InvokeAsync(Item))">Удалить</button>
 </div>
 
 @code {
@@ -54,6 +54,7 @@
     [Parameter]
     public EventCallback Toggle { get; set; }
 
+
     public List<Sub_event> Item_subs { get; set; }
 
     protected override void OnInitialized()
@@ -62,6 +63,13 @@
             Item_subs = _eventController.GetEventSubEvents(Item.Id);
     }
 
+    private Event Change (Event changedEvent)
+    {
+        return new Event();
+    }
+    
+    [Parameter]
+    public EventCallback<Event> Delete { get; set; }
     //[Parameter]
     //public EventCallback<Event> CreateEvent { get; set; }
 

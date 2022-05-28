@@ -1,7 +1,7 @@
 ﻿@inject DailyApplication.Controllers.EventsController EventService;
 
-<Modal Collapse="@CollapseModalOpen" Toggle="@ToggleModalOpen">
-    <OpenEvent Toggle="@ToggleModalOpen" Item="@Item"/>
+<Modal Collapse=CollapseModalOpen Toggle=ToggleModalOpen>
+    <OpenEvent Toggle=ToggleModalOpen Item=Item Delete=DeleteEvent/>
 </Modal>
 <div class="container border-top event" @onmouseover=ToggleDelBtn @onmouseout=ToggleDelBtn>
     <div class="row">
