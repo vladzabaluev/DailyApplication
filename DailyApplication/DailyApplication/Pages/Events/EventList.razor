@@ -11,18 +11,37 @@
 </Modal>
 <div class="d-flex justify-content-between">
     <button class="btn btn-outline-dark mt-1 mb-3" @onclick="@(() => ToggleModalCreate(DateTime.Now))">Создать</button>
-    <DateSelector Week="@week" IncrementWeek="@InWeek" DecrementWeek="@DeWeek"/>
+    <div>
+        <DateSelector Week="@week" IncrementWeek="@InWeek" DecrementWeek="@DeWeek"/>
+        <ViewSelect View=setView />
+    </div>
 </div>
 
-<div class="row mx-0">
-    @for (int weekDay = 0; weekDay < 7; weekDay++)
-    {
-        <EventDayList events=@events week=@week weekDay=@weekDay OpenCreateBox=@ToggleModalCreate/>
-    }
-</div>
+@if(view == "W")
+{
+    <div class="row mx-0">
+        @for (int weekDay = 0; weekDay < 7; weekDay++)
+        {
+            <EventDayList events=@events week=@week weekDay=@weekDay OpenCreateBox=@ToggleModalCreate/>
+        }
+    </div>
+}
+@if(view == "M")
+{
+    <h1>MONTH</h1>
+}
+@if(view == "D")
+{
+    <h1>DAY</h1>
+}
 
 @code
 {
+    private string view = "W";
+    private void setView(string newView)
+    {
+        view = newView;
+    }
     DateTime[] week = new DateTime[7];
     CultureInfo myCI = new CultureInfo("en-US");
     protected override void OnInitialized()
@@ -56,7 +75,8 @@
         return week;
     }
 
-    #region Селектор недель
+    // Селектор недель
+    #region 
 
     void InWeek()
     {
