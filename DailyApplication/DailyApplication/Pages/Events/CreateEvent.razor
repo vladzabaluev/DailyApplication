@@ -25,26 +25,24 @@
                 <input @bind:format="yyyy-MM-ddTHH:mm" type="datetime-local" class="form-control" placeholder="Время окончания" @bind=eventDeadline />
                 <span class="text-danger"></span>
             </div>
-            <div class="form-group">
-                @currentString
+             <div class="form-group">
+                @foreach(var str in subEventList)
+                {
+                    <div class="alert alert-secondary" role="alert">@str</div>
+                }
             </div>
             <div class="form-group">
                 <label class="control-label"></label>
-                <input class="form-control" placeholder="Название" @onchange="((ChangeEventArgs __e)=> { currentString = __e.Value.ToString();
-                                                                                    tempArr.Add(currentString);
-                                                                                })" />
+                <input class="form-control" placeholder="Название" @bind=CurrentSubEventName />
                 <span class="text-danger"></span>
             </div>
-            
-            <div class="form-group">
-                @foreach(var str in tempArr)
-            {
-                <p>@str</p>
-            }
-            </div>
+            @*<div class="form-group">
+                @currentSubEventName
+            </div>*@
+           
     </div>
     <div class="modal-footer">
-        <div @onclick="@(() => Toggle.InvokeAsync(DateTime.Now))">
+        <div>
             <input type="submit" value="Создать" class="btn btn-primary" @onclick=AddEvent @onclick:preventDefault/>
         </div>
         <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@(() => Toggle.InvokeAsync(DateTime.Now))">Закрыть</button>
@@ -52,8 +50,17 @@
 </form>
 
 @code {
-    public string currentString;
-    List<string> tempArr = new List<string>();
+    private string currentSubEventName = "";
+    private string CurrentSubEventName
+    {
+        get => currentSubEventName;
+        set
+        {
+            subEventList.Add(value);
+            currentSubEventName = "";
+        }
+    }
+    List<string> subEventList = new List<string>();
 
     [Parameter]
     public EventCallback<DateTime> Toggle { get; set; }
@@ -85,13 +92,15 @@
 
         if (!string.IsNullOrWhiteSpace(eventName))
         {
-            Event newEvent = _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline, tempArr);
-            
-            await Create.InvokeAsync(newEvent);
+            Event newEvent = _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline, subEventList);
 
+            await Create.InvokeAsync(newEvent);
+            await Toggle.InvokeAsync(DateTime.Now);
             eventName = string.Empty;
             eventDescription = string.Empty;
             eventDeadline = DateTime.Now;
+            currentSubEventName = string.Empty;
+            subEventList.Clear();
         }
 
     }

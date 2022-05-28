@@ -35,13 +35,13 @@
 
     [Parameter]
     public List<Event> events { get; set; }
-    
+
     [Parameter]
     public DateTime[] week { get; set; }
-    
+
     [Parameter]
     public EventCallback<DateTime> OpenCreateBox { get; set; }
-    
+
     [Parameter]
     public int weekDay { get; set; }
 
@@ -50,13 +50,12 @@
     {
         collapseCreateHover = !collapseCreateHover;
     }
-    
+
     #region Удаление события
     private async void DeleteEvent(Event deletedEvent)
     {
-        bool isSucceded = events.Remove(deletedEvent);
-        if(isSucceded)
-            await _eventController.DeleteEvent(deletedEvent.Id);
+        events.Remove(deletedEvent);
+        await _eventController.DeleteEvent(deletedEvent.Id);
     }
     #endregion
 }

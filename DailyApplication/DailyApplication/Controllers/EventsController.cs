@@ -251,12 +251,12 @@ namespace DailyApplication.Controllers
                 return NotFound();
             }
 
-            //List<Sub_event> removableSubEvents=GetEventSubEvents(removableEvent.Id);
-            //foreach(Sub_event sub_Event in removableSubEvents)
-            //{
-            //    Sub_event currentRemSubEvent = _context.Sub_event.FirstOrDefault(remSubEv => remSubEv.Id == sub_Event.Id);
-            //    _context.Sub_event.Remove(currentRemSubEvent);
-            //}
+            List<Sub_event> removableSubEvents = GetEventSubEvents(removableEvent.Id);
+            foreach (Sub_event sub_Event in removableSubEvents)
+            {
+                Sub_event currentRemSubEvent = _context.Sub_event.FirstOrDefault(remSubEv => remSubEv.Id == sub_Event.Id);
+                _context.Sub_event.Remove(currentRemSubEvent);
+            }
             _context.Event.Remove(removableEvent);
 
 
