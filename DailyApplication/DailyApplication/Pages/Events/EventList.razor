@@ -60,7 +60,7 @@
 
         var DateInit = new DateTime(DateTime.Now.Year, 1, 1, 0, 0, 0);
         DateInit = GetFirstDateOfWeek(DateInit, DayOfWeek.Monday);
-        DateInit = myCI.Calendar.AddWeeks(DateInit, myCI.Calendar.GetWeekOfYear(DateTime.Now, myCWR, myFirstDOW) - 1);
+        DateInit = myCI.Calendar.AddWeeks(DateInit, myCI.Calendar.GetWeekOfYear(DateTime.Now.AddDays(-1), myCWR, myFirstDOW) - 1);
         week = weekInit(DateInit);
     }
 
