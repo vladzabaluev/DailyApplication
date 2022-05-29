@@ -1,0 +1,24 @@
+﻿@*<input value="@subEventList[i]" @onchange="((ChangeEventArgs __e) => changeSub(__e.Value.ToString(), i))" class="alert alert-secondary" role="alert" />*@
+<input @bind="@ChangeSub" class="alert alert-secondary" role="alert" />
+
+@code {
+    [Parameter]
+    public List<string> SubEvents { get; set; }
+
+    [Parameter]
+    public int Index { get; set; }
+
+    [Parameter]
+    public EventCallback<List<string>> CallBack { get; set; }
+
+    private string ChangeSub
+    {
+        get => SubEvents[Index];
+        set
+        {
+            SubEvents[Index] = value;
+            CallBack.InvokeAsync(SubEvents);
+        }
+
+    }
+}
