@@ -17,9 +17,9 @@ namespace DailyApplication.Controllers
     public class EventsController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<User> _userManager;
 
-        public EventsController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public EventsController(ApplicationDbContext context, UserManager<User> userManager)
         {
             _context = context;
             _userManager = userManager;
