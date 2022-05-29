@@ -23,13 +23,14 @@
             </p>
         }
     </div>
+    <hr />
     <div class="my-1">
         @if (Item_subs != null)
         {
 
             @foreach (Sub_event sub_Event in Item_subs)
             {<p class="card-text">
-        @sub_Event.Description
+                    @sub_Event.Description
                 </p>
             }
 
@@ -54,7 +55,6 @@
     [Parameter]
     public EventCallback Toggle { get; set; }
 
-
     public List<Sub_event> Item_subs { get; set; }
 
     protected override void OnInitialized()
@@ -63,11 +63,12 @@
             Item_subs = _eventController.GetEventSubEvents(Item.Id);
     }
 
-    private Event Change (Event changedEvent)
+    private async void Change(Event changedEvent)
     {
-        return new Event();
+        await _eventController.Edit(Item.Id, Item);
+        //  return new Event();
     }
-    
+
     [Parameter]
     public EventCallback<Event> Delete { get; set; }
     //[Parameter]
