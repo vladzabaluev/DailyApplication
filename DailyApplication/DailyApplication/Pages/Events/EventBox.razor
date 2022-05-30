@@ -3,10 +3,10 @@
 <Modal Collapse=CollapseModalOpen Toggle=ToggleModalOpen>
     <OpenEvent Toggle=ToggleModalOpen Item=Item Delete=DeleteEvent/>
 </Modal>
-<div class="container border-top event" @onmouseover=ToggleDelBtn @onmouseout=ToggleDelBtn>
+<div class="container border-top event overflow-hidden" @onmouseover=ToggleDelBtn @onmouseout=ToggleDelBtn>
     <div class="row">
         <div class="col-10 px-0" @onclick="ToggleModalOpen">
-            <h5 class="py-2 overflow-hidden m-0">
+            <h5 class="py-2 m-0">
                 @Item.Name
             </h5>
         </div>

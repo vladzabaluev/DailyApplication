@@ -27,20 +27,22 @@
                         </NavLink>
                     </li>
                 </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" @onclick="(()=>show = !show)">
-                                0
-                            </button>
-                            <div class="dropdown-menu @showDropDown" aria-labelledby="dropdownMenuButton">
-                                <div class="dropdown-item" @onclick="@(() => show = false)">
-                                    Нет приглашений
+                <AuthorizeView>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" @onclick="(()=>show = !show)">
+                                    0
+                                </button>
+                                <div class="dropdown-menu @showDropDown" aria-labelledby="dropdownMenuButton">
+                                    <div class="dropdown-item" @onclick="@(() => show = false)">
+                                        Нет приглашений
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </li>
-                </ul>
+                        </li>
+                    </ul>
+                </AuthorizeView>
                 <LoginDisplay />
             </div>
         </div>
