@@ -7,30 +7,30 @@
 
 <h1>События</h1>
 <Modal Collapse="@CollapseModalCreate" Toggle="@(() => ToggleModalCreate(DateTime.Now))">
-    <CreateEvent Toggle="@(() => ToggleModalCreate(DateTime.Now))" Create="@CreateEvent" eventDeadline="@CreateDeadlineTime"/>
+    <CreateEvent Toggle="@(() => ToggleModalCreate(DateTime.Now))" Create="@CreateEvent" eventDeadline="@CreateDeadlineTime" />
 </Modal>
 <div class="d-flex justify-content-between">
     <button class="btn btn-outline-dark mt-1 mb-3" @onclick="@(() => ToggleModalCreate(DateTime.Now))">Создать</button>
     <div>
-        <DateSelector Week="@week" IncrementWeek="@InWeek" DecrementWeek="@DeWeek"/>
+        <DateSelector Week="@week" IncrementWeek="@InWeek" DecrementWeek="@DeWeek" />
         <ViewSelect View=setView />
     </div>
 </div>
 
-@if(view == "W")
+@if (view == "W")
 {
     <div class="row mx-0">
         @for (int weekDay = 0; weekDay < 7; weekDay++)
         {
-            <EventDayList events=@events week=@week weekDay=@weekDay OpenCreateBox=@ToggleModalCreate/>
+            <EventDayList events=@events week=@week weekDay=@weekDay OpenCreateBox=@ToggleModalCreate />
         }
     </div>
 }
-@if(view == "M")
+@if (view == "M")
 {
     <h1>MONTH</h1>
 }
-@if(view == "D")
+@if (view == "D")
 {
     <h1>DAY</h1>
 }
@@ -74,18 +74,18 @@
         }
         return week;
     }
-    
+
     // Селектор недель
-    #region 
+    #region
 
     void InWeek()
     {
-        week = weekInit(myCI.Calendar.AddWeeks(week[0], + 1));
+        week = weekInit(myCI.Calendar.AddWeeks(week[0], +1));
     }
 
-    void DeWeek ()
+    void DeWeek()
     {
-        week = weekInit(myCI.Calendar.AddWeeks(week[0], - 1));
+        week = weekInit(myCI.Calendar.AddWeeks(week[0], -1));
     }
     #endregion
 
@@ -99,7 +99,7 @@
         CollapseModalCreate = !CollapseModalCreate;
     }
 
-    private void CreateEvent (Event newEvent)
+    private void CreateEvent(Event newEvent)
     {
         events.Add(newEvent);
     }
@@ -116,7 +116,9 @@
         AuthenticationState currentAuth = await authenticationStateTask;
         ClaimsPrincipal currentUser = currentAuth.User;
 
-        events = _eventController.GetUserEvents(currentUser);
+        //events = _eventController.GetGroupEvents(currentUser);
+        //events = _eventController.GetUserEvents(currentUser);
+        events = _eventController.GetAllUserEvent(currentUser);
     }
     #endregion
 }
