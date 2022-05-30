@@ -10,7 +10,6 @@ using DailyApplication.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using DailyApplication.Pages.Events;
 
 namespace DailyApplication.Controllers
 {
@@ -184,6 +183,42 @@ namespace DailyApplication.Controllers
 
         #endregion Изменить события
 
+        #region Изменить подсобытия
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubEdit(int id, [Bind("Id,Name,Description")] Sub_event subEvent)
+        {
+            if (id != subEvent.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(subEvent);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!EventExists(subEvent.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+            return RedirectToAction(nameof(GetUserEvents));
+        }
+
+        #endregion Изменить подсобытия
+
         #region Выполнить событие
 
         [Authorize]
@@ -207,6 +242,30 @@ namespace DailyApplication.Controllers
         }
 
         #endregion Выполнить событие
+
+        #region Выполнить подсобытие
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DoneSubEvent(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var processSUBEvent = await _context.Sub_event.FirstOrDefaultAsync(procEv => procEv.Id == id);
+            if (processSUBEvent == null)
+            {
+                return NotFound();
+            }
+            processSUBEvent.isDone = true;
+            _context.Update(processSUBEvent);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(GetUserEvents));
+        }
+
+        #endregion Выполнить подсобытие
 
         private bool EventExists(int id)
         {

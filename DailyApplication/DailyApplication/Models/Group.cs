@@ -13,5 +13,9 @@ namespace DailyApplication.Models
         public List<UserGroup> UserGroups { get; set; }
 
         public List<Event> Events { get; set; }
+
+        public Group()
+        {
+        }
     }
 }

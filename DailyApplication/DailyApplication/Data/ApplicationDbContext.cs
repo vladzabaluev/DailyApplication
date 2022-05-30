@@ -22,5 +22,15 @@ namespace DailyApplication.Data
         public DbSet<DailyApplication.Models.Event> Event { get; set; }
 
         public DbSet<DailyApplication.Models.Sub_event> Sub_event { get; set; }
+
+        public DbSet<DailyApplication.Models.UserGroup> UserGroup { get; set; }
+
+        //public DbSet<DailyApplication.Models.Group> Group { get; set; }
+
+        public DbSet<DailyApplication.Models.User> User { get; set; }
+
+        //public DbSet<DailyApplication.Models.Group> Group { get; set; }
+
+        public DbSet<DailyApplication.Models.Group> Group { get; set; }
     }
 }
