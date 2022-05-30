@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using DailyApplication.Data;
 using DailyApplication.Models;
 using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace DailyApplication.Controllers
 {
@@ -24,10 +25,10 @@ namespace DailyApplication.Controllers
 
         #region Все группы пользователя
 
-        public List<Group> GetUserGroups()
+        public List<Group> GetUserGroups(ClaimsPrincipal User)
         {
             List<Group> Groups = new List<Group>(); //сюда запишу все группы текущего пользователя
-            Models.User currentUser = _userManager.GetUserAsync(User).Result; //найду текущего пользователя
+            User currentUser = _userManager.GetUserAsync(User).Result; //найду текущего пользователя
             List<UserGroup> UserGroups = _context.UserGroup.Where
                 (findGroup => findGroup.User == currentUser).ToList(); //найду все ЮзерГруппы, связанные с нашим юзером
             foreach (UserGroup group in UserGroups) //благодаря юзергруппам найду все группы пользователя

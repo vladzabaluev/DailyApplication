@@ -41,6 +41,7 @@ namespace DailyApplication
             services.AddServerSideBlazor();
 
             services.AddScoped<EventsController>();
+            services.AddScoped<GroupsController>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
