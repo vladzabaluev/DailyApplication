@@ -17,7 +17,7 @@
         </div>
         <div class="form-group">
             <label class="control-label">Описание</label>
-            <input type="textarea" class="form-control" placeholder="Описание" @bind=eventDescription />
+            <input type="text" class="form-control" placeholder="Описание" @bind=eventDescription />
             <span class="text-danger"></span>
         </div>
         <div class="form-group">
@@ -27,16 +27,16 @@
         </div>
         <div class="form-group">
             <div class="dropdown">
-              <button class="btn btn-secondary dropdown-toggle" type="button" @onclick="(()=>show = !show)">
-                @eventGroupName
+                <button class="btn btn-secondary dropdown-toggle" type="button" @onclick="(()=>show = !show)">
+                    @eventGroupName
                 </button>
-              <div class="dropdown-menu @showDropDown" aria-labelledby="dropdownMenuButton">
-                     <div class="dropdown-item" @onclick="@(() => {
+                <div class="dropdown-menu @showDropDown" aria-labelledby="dropdownMenuButton">
+                    <div class="dropdown-item" @onclick="@(() => {
                                                                     eventGroup = null;
                                                                     eventGroupName = "Команда";
                                                                     show = false;
                                                                   })">
-                     Нет команды
+                        Нет команды
                     </div>
                     @foreach (var group in groups)
                     {
@@ -48,31 +48,31 @@
                             @group.Name
                         </div>
                     }
-              </div>
+                </div>
             </div>
         </div>
         <div class="form-group">
             <label class="control-label">Подсобытия:</label>
             <div class="form-group">
-                @for(int i = 0; i < subEventList.Count; i++ )
+                @for (int i = 0; i < subEventList.Count; i++)
                 {
                     @*<input value="@subEventList[i]" @onchange="((ChangeEventArgs __e) => OneSub(__e.Value.ToString(), i))"  class="alert alert-secondary" role="alert" />*@
                     @*<div class="alert alert-secondary" role="alert">@subEventList[i]</div>*@
-                    <Input SubEvents="@subEventList" Index="@i" CallBack="@((value) => subEventList = value)"></Input>
+                    <Input SubEvents="@subEventList" Index="@i" CallBack="@((value) => subEventList = value)" />
                 }
-                <input class="form-control" placeholder="Подсобытие" @bind=GetSubEvent  />
+                <input class="form-control" placeholder="Подсобытие" @bind=GetSubEvent />
                 @*<input class="form-control" value="@currentSubEventName" placeholder="Название" @onchange="((ChangeEventArgs __e)=> { currentSubEventName = __e.Value.ToString();
-                                                                                    subEventList.Add(currentSubEventName);
-                                                                                    currentSubEventName = string.Empty;
-                                                                                    __e.Value= string.Empty;
-                                                                                })" />*@
+                        subEventList.Add(currentSubEventName);
+                        currentSubEventName = string.Empty;
+                        __e.Value= string.Empty;
+                    })" />*@
                 <span class="text-danger"></span>
             </div>
         </div>
     </div>
     <div class="modal-footer">
         <div>
-            <input type="submit" value="Создать" class="btn btn-primary" @onclick=AddEvent @onclick:preventDefault/>
+            <input type="submit" value="Создать" class="btn btn-primary" @onclick=AddEvent @onclick:preventDefault />
         </div>
         <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="@(() => Toggle.InvokeAsync(DateTime.Now))">Закрыть</button>
     </div>
@@ -82,7 +82,7 @@
     [CascadingParameter]
     protected List<Group> groups { get; set; }
     private bool show = false;
-    #nullable enable
+#nullable enable
     private string? showDropDown => show ? "show" : null;
     private string currentSubEventName = "";
     private int? eventGroup;
@@ -108,8 +108,8 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    private string eventName;
-    private string eventDescription;
+    private string? eventName;
+    private string? eventDescription;
 
     [Parameter]
     public EventCallback<Event> Create { get; set; }

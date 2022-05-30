@@ -1,7 +1,7 @@
 ﻿@inject DailyApplication.Controllers.EventsController _eventController;
 @using System.Security.Claims
 
-@if(edit)
+@if (edit)
 {
     <div class="modal-header">
         <h5 class="modal-title">Изменить событие</h5>
@@ -18,7 +18,7 @@
         </div>
         <div class="form-group">
             <label class="control-label">Описание</label>
-            <input type="textarea" class="form-control" placeholder="Описание" @bind=Item.Description />
+            <input type="text" class="form-control" placeholder="Описание" @bind=Item.Description />
             <span class="text-danger"></span>
         </div>
         <div class="form-group">
@@ -27,19 +27,19 @@
             <span class="text-danger"></span>
         </div>
         <label class="control-label">Подсобытия:</label>
-            <div class="form-group">
-            @for(int i = 0; i < tempSubEvents.Count; i++ )
+        <div class="form-group">
+            @for (int i = 0; i < tempSubEvents.Count; i++)
             {
                 @*<input value="@subEventList[i]" @onchange="((ChangeEventArgs __e) => OneSub(__e.Value.ToString(), i))"  class="alert alert-secondary" role="alert" />*@
                 @*<div class="alert alert-secondary" role="alert">@subEventList[i]</div>*@
-                <Input SubEvents="@tempSubEvents" Index="@i" CallBack="@((value) => tempSubEvents = value)"></Input>
+                <Input SubEvents="@tempSubEvents" Index="@i" CallBack="@((value) => tempSubEvents = value)" />
             }
-            <input class="form-control" placeholder="Подсобытие" @bind=GetSubEvent  />
+            <input class="form-control" placeholder="Подсобытие" @bind=GetSubEvent />
             @*<input class="form-control" value="@currentSubEventName" placeholder="Название" @onchange="((ChangeEventArgs __e)=> { currentSubEventName = __e.Value.ToString();
-                                                                                subEventList.Add(currentSubEventName);
-                                                                                currentSubEventName = string.Empty;
-                                                                                __e.Value= string.Empty;
-                                                                            })" />*@
+                    subEventList.Add(currentSubEventName);
+                    currentSubEventName = string.Empty;
+                    __e.Value= string.Empty;
+                })" />*@
             <span class="text-danger"></span>
         </div>
     </div>
@@ -49,7 +49,7 @@
                                                                                                 changeEvent(Item);
                                                                                                 Change();
                                                                                                 Toggle.InvokeAsync(DateTime.Now);
-                                                                                           })" @onclick:preventDefault/>
+                                                                                           })" @onclick:preventDefault />
         </div>
         <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="Change">Отмена</button>
     </div>
@@ -131,8 +131,8 @@ else
     {
         if (_eventController.GetEventSubEvents(Item.Id) != null)
             Item_subs = _eventController.GetEventSubEvents(Item.Id);
-         
-        if (Item_subs != null)   
+
+        if (Item_subs != null)
             foreach (Sub_event subEvent in Item_subs)
                 tempSubEvents.Add(subEvent.Description);
     }
@@ -144,8 +144,8 @@ else
 
     [Parameter]
     public EventCallback<Event> Delete { get; set; }
-    
-    private async void changeEvent (Event editedEvent)
+
+    private async void changeEvent(Event editedEvent)
     {
         await _eventController.Edit(editedEvent.Id, editedEvent);
     }
