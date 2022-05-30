@@ -32,19 +32,21 @@
                 </button>
                 <div class="dropdown-menu @showDropDown" aria-labelledby="dropdownMenuButton">
                     <div class="dropdown-item" @onclick="@(() => {
-                                                                    eventGroup = null;
-                                                                    eventGroupName = "Команда";
-                                                                    show = false;
-                                                                  })">
+                                                               eventGroup = null;
+                                                               eventGroupName = "Команда";
+                                                               show = false;
+                                                               currentGroup = null;
+                                                           })">
                         Нет команды
                     </div>
                     @foreach (var group in groups)
                     {
                         <div class="dropdown-item" @onclick="(() => {
-                                                                        eventGroup = group.Id;
-                                                                        eventGroupName = group.Name;
-                                                                        show = false;
-                                                                    })">
+                                                                 eventGroup = group.Id;
+                                                                 eventGroupName = group.Name;
+                                                                 show = false;
+                                                                 currentGroup = group;
+                                                             })">
                             @group.Name
                         </div>
                     }
@@ -87,6 +89,7 @@
     private string currentSubEventName = "";
     private int? eventGroup;
     private string eventGroupName = "Команда";
+    private Group? currentGroup;
     private string GetSubEvent
     {
         get => currentSubEventName;
@@ -122,7 +125,7 @@
         if (!string.IsNullOrWhiteSpace(eventName))
         {
             Console.WriteLine(eventGroup);
-            Event newEvent = _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline, subEventList);
+            Event newEvent = _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline, subEventList, currentGroup);
 
             await Create.InvokeAsync(newEvent);
             await Toggle.InvokeAsync(DateTime.Now);

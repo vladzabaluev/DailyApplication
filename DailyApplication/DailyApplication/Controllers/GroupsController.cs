@@ -58,11 +58,7 @@ namespace DailyApplication.Controllers
             return View(@group);
         }
 
-        // GET: Groups/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+        #region Создание группы
 
         // POST: Groups/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -79,10 +75,11 @@ namespace DailyApplication.Controllers
                 _context.Add(@group);
                 _context.Add(newUserGroup);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(EventsController.GetUserEvents));
             }
-            return View(@group);
+            return RedirectToAction(nameof(EventsController.GetUserEvents));
         }
+
+        #endregion Создание группы
 
         // GET: Groups/Edit/5
         public async Task<IActionResult> Edit(int? id)

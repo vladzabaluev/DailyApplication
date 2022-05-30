@@ -31,10 +31,8 @@
         ClaimsPrincipal currentUser = currentAuth.User;
 
         groups = _groupsController.GetUserGroups(currentUser);
-        groups.Add(new Group() { Id = 1, Name = "Heh", Description = "adaw" });
-        groups.Add(new Group() { Id = 2, Name = "KCa", Description = "MEME" });
 
-        @foreach(var item in groups)
+        @foreach (var item in groups)
         {
             Console.WriteLine(item.Name);
         }
