@@ -65,7 +65,7 @@ namespace DailyApplication.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Group @group, ClaimsPrincipal User)
+        public async Task<Group> Create([Bind("Id,Name,Description")] Group @group, ClaimsPrincipal User)
         {
             if (ModelState.IsValid)
             {
@@ -75,8 +75,9 @@ namespace DailyApplication.Controllers
                 _context.Add(@group);
                 _context.Add(newUserGroup);
                 await _context.SaveChangesAsync();
+                RedirectToAction(nameof(EventsController.GetUserEvents));
             }
-            return RedirectToAction(nameof(EventsController.GetUserEvents));
+            return group;
         }
 
         #endregion Создание группы
@@ -118,7 +119,7 @@ namespace DailyApplication.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!GroupExists(@group.Id))
+                    if (!GroupExists(@group.Id).Result)
                     {
                         return NotFound();
                     }
@@ -161,9 +162,9 @@ namespace DailyApplication.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool GroupExists(int id)
+        public async Task<bool> GroupExists(int id)
         {
-            return _context.Group.Any(e => e.Id == id);
+            return await _context.Group.AnyAsync(e => e.Id == id);
         }
     }
 }

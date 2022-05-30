@@ -34,7 +34,7 @@
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-    private async void Create()
+    private async Task<Group> Create()
     {
         AuthenticationState currentAuth = await authenticationStateTask;
         ClaimsPrincipal currentUser = currentAuth.User;
@@ -45,11 +45,10 @@
             Description = groupDescription,
         };
 
+        newGroup = await _groupsController.Create(newGroup, currentUser);
         groups.Add(newGroup);
-        await _groupsController.Create(newGroup, currentUser);
-
+        return null;
     }
-
     [CascadingParameter]
     protected List<Group> groups { get; set; }
 }
