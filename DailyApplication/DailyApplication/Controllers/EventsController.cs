@@ -17,11 +17,13 @@ namespace DailyApplication.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly GroupsController _groupsController;
 
-        public EventsController(ApplicationDbContext context, UserManager<User> userManager)
+        public EventsController(ApplicationDbContext context, UserManager<User> userManager, GroupsController groupsController)
         {
             _context = context;
             _userManager = userManager;
+            _groupsController = groupsController;
         }
 
         #region Создать ивент
@@ -59,20 +61,63 @@ namespace DailyApplication.Controllers
 
         #region Вернуть ивенты
 
+        //ALL EVENTS IN DB
         public List<Event> GetAllEvents()
         {
             return _context.Event.ToList();
         }
 
+        //ONLY USER WITHOUT GROUP
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public List<Event> GetUserEvents(ClaimsPrincipal user)
         {
             List<Event> events = _context.Event.Where(ev => ev.User == _userManager.GetUserAsync(user).Result).ToList();
+            SortByTime(events);
+            return events;
+        }
+
+        //ONLY GROUP WITHOUT USER
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public List<Event> GetGroupEvents(ClaimsPrincipal user)
+        {
+            List<Group> UserGroups = _groupsController.GetUserGroups(user);
+            List<Event> events = new List<Event>();
+
+            //Найти все группы пользователя
+            foreach (Group group in UserGroups)
+            {
+                events.AddRange(_context.Event.Where(GroupEvent => GroupEvent.Group == group));
+            }
+            SortByTime(events);
+            return events;
+            //найти все их ивенты и вернуть их отсортировав по времени
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public List<Event> GetAllUserEvent(ClaimsPrincipal user)
+        {
+            List<Event> events = new List<Event>();
+            events.AddRange(GetUserEvents(user));
+            events.AddRange(GetGroupEvents(user));
+            SortByTime(events);
+            return events;
+        }
+
+        #region SORTIROVKA
+
+        private List<Event> SortByTime(List<Event> events)
+        {
             events.Sort((Event x, Event y) => x.DeadlineTime.CompareTo(y.DeadlineTime));
             return events;
         }
+
+        #endregion SORTIROVKA
 
         #endregion Вернуть ивенты
 
@@ -140,14 +185,6 @@ namespace DailyApplication.Controllers
         #endregion Удалить события
 
         #region Изменить события
-
-        //public void UpdateEvent(Event changedEvent)
-        //{
-        //    var item = _context.Event.Attach(changedEvent);
-        //    item.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-
-        //    _context.SaveChanges();
-        //}
 
         [Authorize]
         [HttpPost]

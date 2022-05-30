@@ -119,7 +119,7 @@ namespace DailyApplication.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!GroupExists(@group.Id).Result)
+                    if (!GroupExists(@group.Id))
                     {
                         return NotFound();
                     }
@@ -162,9 +162,9 @@ namespace DailyApplication.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<bool> GroupExists(int id)
+        private bool GroupExists(int id)
         {
-            return await _context.Group.AnyAsync(e => e.Id == id);
+            return _context.Group.Any(e => e.Id == id);
         }
     }
 }
