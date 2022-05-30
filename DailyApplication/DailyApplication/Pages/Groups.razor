@@ -15,16 +15,16 @@
 
 <button @onclick=Create>Создать группу</button>
 
-<h2>Доступные группы:</h2>
+<h1 class="display-3 my-2">Доступные группы:</h1>
 
 <div>
     @foreach (var group in groups)
     {
-        @group.Id;
-        <hr />
-        @group.Name;
-        <hr />
-        @group.Description
+        <div class="alert alert-info" role="alert">
+            <h4 class="alert-heading">@group.Id. @group.Name</h4>
+            <hr />
+            <p>@group.Description</p>
+        </div>
     }
 </div>
 
@@ -35,19 +35,10 @@
     private void Create ()
     {
         //_groupsController.Create(groupName, groupDescription);
+        groups.Add(new Group() { Id = 3, Name = groupName, Description = groupDescription });
 
     }
-
-    private List<Group> groups = new();
-
+    
     [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
-
-    protected async override Task OnInitializedAsync()
-    {
-        AuthenticationState currentAuth = await authenticationStateTask;
-        ClaimsPrincipal currentUser = currentAuth.User;
-
-        groups = _groupsController.GetUserGroups(currentUser);
-    }
+    protected List<Group> groups { get; set; }
 }

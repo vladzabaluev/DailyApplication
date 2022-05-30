@@ -25,21 +25,49 @@
             <input @bind:format="yyyy-MM-ddTHH:mm" type="datetime-local" class="form-control" placeholder="Время окончания" @bind=eventDeadline />
             <span class="text-danger"></span>
         </div>
-        <label class="control-label">Подсобытия:</label>
+        <div class="form-group">
+            <div class="dropdown">
+              <button class="btn btn-secondary dropdown-toggle" type="button" @onclick="(()=>show = !show)">
+                @eventGroupName
+                </button>
+              <div class="dropdown-menu @showDropDown" aria-labelledby="dropdownMenuButton">
+                     <div class="dropdown-item" @onclick="@(() => {
+                                                                    eventGroup = null;
+                                                                    eventGroupName = "Команда";
+                                                                    show = false;
+                                                                  })">
+                     Нет команды
+                    </div>
+                    @foreach (var group in groups)
+                    {
+                        <div class="dropdown-item" @onclick="(() => {
+                                                                        eventGroup = group.Id;
+                                                                        eventGroupName = group.Name;
+                                                                        show = false;
+                                                                    })">
+                            @group.Name
+                        </div>
+                    }
+              </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label">Подсобытия:</label>
             <div class="form-group">
-            @for(int i = 0; i < subEventList.Count; i++ )
-            {
-                @*<input value="@subEventList[i]" @onchange="((ChangeEventArgs __e) => OneSub(__e.Value.ToString(), i))"  class="alert alert-secondary" role="alert" />*@
-                @*<div class="alert alert-secondary" role="alert">@subEventList[i]</div>*@
-                <Input SubEvents="@subEventList" Index="@i" CallBack="@((value) => subEventList = value)"></Input>
-            }
-            <input class="form-control" placeholder="Подсобытие" @bind=GetSubEvent  />
-            @*<input class="form-control" value="@currentSubEventName" placeholder="Название" @onchange="((ChangeEventArgs __e)=> { currentSubEventName = __e.Value.ToString();
-                                                                                subEventList.Add(currentSubEventName);
-                                                                                currentSubEventName = string.Empty;
-                                                                                __e.Value= string.Empty;
-                                                                            })" />*@
-            <span class="text-danger"></span>
+                @for(int i = 0; i < subEventList.Count; i++ )
+                {
+                    @*<input value="@subEventList[i]" @onchange="((ChangeEventArgs __e) => OneSub(__e.Value.ToString(), i))"  class="alert alert-secondary" role="alert" />*@
+                    @*<div class="alert alert-secondary" role="alert">@subEventList[i]</div>*@
+                    <Input SubEvents="@subEventList" Index="@i" CallBack="@((value) => subEventList = value)"></Input>
+                }
+                <input class="form-control" placeholder="Подсобытие" @bind=GetSubEvent  />
+                @*<input class="form-control" value="@currentSubEventName" placeholder="Название" @onchange="((ChangeEventArgs __e)=> { currentSubEventName = __e.Value.ToString();
+                                                                                    subEventList.Add(currentSubEventName);
+                                                                                    currentSubEventName = string.Empty;
+                                                                                    __e.Value= string.Empty;
+                                                                                })" />*@
+                <span class="text-danger"></span>
+            </div>
         </div>
     </div>
     <div class="modal-footer">
@@ -51,7 +79,14 @@
 </form>
 
 @code {
+    [CascadingParameter]
+    protected List<Group> groups { get; set; }
+    private bool show = false;
+    #nullable enable
+    private string? showDropDown => show ? "show" : null;
     private string currentSubEventName = "";
+    private int? eventGroup;
+    private string eventGroupName = "Команда";
     private string GetSubEvent
     {
         get => currentSubEventName;
@@ -86,6 +121,7 @@
 
         if (!string.IsNullOrWhiteSpace(eventName))
         {
+            Console.WriteLine(eventGroup);
             Event newEvent = _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline, subEventList);
 
             await Create.InvokeAsync(newEvent);
@@ -99,13 +135,8 @@
         }
 
     }
-
     protected override void OnParametersSet()
     {
-        Console.WriteLine($"{currentSubEventName}");
-        foreach (var item in subEventList)
-        {
-            Console.WriteLine($"{item}");
-        }
+        Console.WriteLine(eventGroup);
     }
 }
