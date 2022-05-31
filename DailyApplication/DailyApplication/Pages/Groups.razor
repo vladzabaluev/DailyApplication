@@ -32,26 +32,29 @@
 </div>
 
 @code {
-    private string groupName;
+    private string groupName = "";
     private string groupDescription;
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     private async Task<Group> Create()
     {
-        AuthenticationState currentAuth = await authenticationStateTask;
-        ClaimsPrincipal currentUser = currentAuth.User;
-
-        Group newGroup = new Group()
+        if (groupName != "")
         {
-            Name = groupName,
-            Description = groupDescription,
-        };
+            AuthenticationState currentAuth = await authenticationStateTask;
+            ClaimsPrincipal currentUser = currentAuth.User;
 
-        newGroup = await _groupsController.Create(newGroup, currentUser);
-        groups.Add(newGroup);
-        groupName = string.Empty;
-        groupDescription = string.Empty;
+            Group newGroup = new Group()
+            {
+                Name = groupName,
+                Description = groupDescription,
+            };
+
+            newGroup = await _groupsController.Create(newGroup, currentUser);
+            groups.Add(newGroup);
+            groupName = string.Empty;
+            groupDescription = string.Empty;
+        }
         return null;
     }
     [CascadingParameter]
