@@ -4,6 +4,7 @@
 @using Microsoft.VisualBasic;
 @using System.Security.Claims
 @inject DailyApplication.Controllers.EventsController _eventController;
+@inject DailyApplication.Controllers.GroupsController _groupController;
 
 <h1>События</h1>
 <Modal Collapse="@CollapseModalCreate" Toggle="@(() => ToggleModalCreate(DateTime.Now))">
@@ -183,7 +184,7 @@
 
         //events = _eventController.GetGroupEvents(currentUser);
         //events = _eventController.GetUserEvents(currentUser);
-        events = _eventController.GetAllUserEvent(currentUser);
+        events = _eventController.GetAllUserEvent(currentUser, _groupController);
     }
     #endregion
 }
