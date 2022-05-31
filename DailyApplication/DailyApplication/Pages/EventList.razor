@@ -33,23 +33,22 @@
     <div class="row mx-0">
         @for (int weekDay = 0; weekDay < 7; weekDay++)
         {
-            <EventDayList events=@events week=@week weekDay=@weekDay OpenCreateBox=@ToggleModalCreate />
+            <WeekView events=@events week=@week weekDay=@weekDay OpenCreateBox=@ToggleModalCreate />
         }
     </div>
 }
 @if (view == "M")
 {
     <div class="row mx-0">
-        @for (int weekNum = 0, day = -1; weekNum < 6; weekNum++)
+        @for (int weekNum = 0, day = 0; weekNum < 6; weekNum++)
         {
             <div class="row mx-0" style="width:100%;">
                 @for(int weekDay = 0; weekDay < 7; weekDay++)
                 {
-                    day++;
-                    Console.WriteLine(day);
-                    <div class="col" style="width:14.28%;">
-                        <p class="text-center">@month[day]</p>
+                    <div class="col py-2" style="width:14.28%;">
+                        <MonthView Date=month[day] Events=@events WeekDay=@weekDay OpenCreateBox=@ToggleModalCreate/>
                     </div>
+                    day++;
                 }
             </div>
         }
@@ -58,7 +57,7 @@
 @if (view == "D")
 {
     <div class="row mx-0">
-        <EventDayList  events=@events week=@week OpenCreateBox=@ToggleModalCreate />
+        <DayView  Events=@events Date=@day OpenCreateBox=@ToggleModalCreate />
     </div>
 }
 
@@ -122,7 +121,6 @@
     // Селектор
     #region
     private string WeekDate;
-    private string MonthDate;
     void InWeek()
     {
         week = weekInit(myCI.Calendar.AddWeeks(week[0], +1));
