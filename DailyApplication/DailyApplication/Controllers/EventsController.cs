@@ -298,7 +298,7 @@ namespace DailyApplication.Controllers
             {
                 return NotFound();
             }
-            processSUBEvent.isDone = true;
+            processSUBEvent.isDone = !processSUBEvent.isDone;
             _context.Update(processSUBEvent);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(GetUserEvents));
