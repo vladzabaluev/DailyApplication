@@ -124,7 +124,10 @@ else
         get => currentSubEventName;
         set
         {
-            tempSubEvents.Add(value);
+            Item_subs.Add(new Sub_event() { 
+                Description = value, 
+                isDone = false
+            });
             currentSubEventName = "";
         }
     }
@@ -146,7 +149,7 @@ else
 
     private void Done()
     {
-        
+
     }
 
     [Parameter]
@@ -154,6 +157,7 @@ else
 
     private async void changeEvent(Event editedEvent)
     {
+        editedEvent.SubEvents = Item_subs;
         await _eventController.Edit(editedEvent.Id, editedEvent);
     }
 }
