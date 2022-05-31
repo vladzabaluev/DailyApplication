@@ -26,6 +26,6 @@ else
     private async void Done (int Id)
     {
         await _eventController.DoneSubEvent(Id);
-        cb.InvokeAsync(!SubEvents[Index].isDone);
+        await cb.InvokeAsync(SubEvents[Index].isDone);
     }
 }
