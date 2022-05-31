@@ -2,7 +2,8 @@
 
 <div>
     <input @bind="@ChangeSub" class="alert alert-secondary" role="alert" />
-    <input type="checkbox" @onchange="@(() => Done(SubEvents[Index].Id))"/>
+    <CheckBox Index=Index SubEvents=SubEvents cb=DoneSub/>
+    <button class="btn btn-danger" @onclick="(() => DeleteSub(SubEvents[Index]))">Удалить</button>
 </div>
 
 @code {
@@ -24,11 +25,18 @@
             SubEvents[Index].Description = value;
             CallBack.InvokeAsync(SubEvents);
         }
-
     }
 
-    private async void Done (int Id)
+    private void DoneSub (bool isDone)
     {
-        await _eventController.DoneSubEvent(Id);
+        SubEvents[Index].isDone = isDone;
+        CallBack.InvokeAsync(SubEvents);
+    }
+
+    private async void DeleteSub (Sub_event subEvent)
+    {
+        await _eventController.DeleteEventSubEvents(subEvent.Id);
+        SubEvents.Remove(subEvent);
+        await CallBack.InvokeAsync(SubEvents);
     }
 }
