@@ -7,9 +7,12 @@
 @inject DailyApplication.Controllers.GroupsController _groupController;
 
 <h1>События</h1>
-<Modal Collapse="@CollapseModalCreate" Toggle="@(() => ToggleModalCreate(DateTime.Now))">
-    <CreateEvent Toggle="@(() => ToggleModalCreate(DateTime.Now))" Create="@CreateEvent" eventDeadline="@CreateDeadlineTime" />
-</Modal>
+@if (ModalCreate)
+{
+    <Modal Toggle="@(() => ToggleModalCreate(DateTime.Now))">
+        <CreateEvent Toggle="@(() => ToggleModalCreate(DateTime.Now))" Create="@CreateEvent" eventDeadline="@CreateDeadlineTime" />
+    </Modal>
+}
 <div class="d-flex justify-content-between">
     <button class="btn btn-outline-dark mt-1 mb-3" @onclick="@(() => ToggleModalCreate(DateTime.Now))">Создать</button>
     <div>
@@ -156,13 +159,13 @@
     #endregion
 
     #region Создание события
-    private bool CollapseModalCreate = false;
+    private bool ModalCreate = false;
     private DateTime CreateDeadlineTime;
 
     private void ToggleModalCreate(DateTime DeadlineTime)
     {
         CreateDeadlineTime = DeadlineTime;
-        CollapseModalCreate = !CollapseModalCreate;
+        ModalCreate = !ModalCreate;
     }
 
     private void CreateEvent(Event newEvent)
