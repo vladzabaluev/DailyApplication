@@ -17,13 +17,14 @@ namespace DailyApplication.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
-        private readonly GroupsController _groupsController;
+        private GroupsController _groupsController;
 
-        public EventsController(ApplicationDbContext context, UserManager<User> userManager, GroupsController groupsController)
+        //  private readonly IConfigureGroupSerializer configureGroupSerializer;
+        public EventsController(ApplicationDbContext context, UserManager<User> userManager/*, GroupsController groupsController*/)
         {
             _context = context;
             _userManager = userManager;
-            _groupsController = groupsController;
+            //_groupsController = groupsController;
         }
 
         #region Создать ивент
@@ -100,8 +101,9 @@ namespace DailyApplication.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public List<Event> GetAllUserEvent(ClaimsPrincipal user)
+        public List<Event> GetAllUserEvent(ClaimsPrincipal user, GroupsController groupsController)
         {
+            _groupsController = groupsController;
             List<Event> events = new List<Event>();
             events.AddRange(GetUserEvents(user));
             events.AddRange(GetGroupEvents(user));

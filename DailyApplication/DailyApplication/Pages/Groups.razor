@@ -1,6 +1,7 @@
 ﻿@page "/groups"
 @using System.Security.Claims
 @inject DailyApplication.Controllers.GroupsController _groupsController;
+@inject DailyApplication.Controllers.EventsController _eventController;
 
 <form>
     <div class="form-group">
@@ -26,7 +27,7 @@
             <hr />
             <p>@group.Description</p>
             <button class="btn btn-info">Пригласить пользователя</button>
-            <button class="btn btn-danger">Удалить группу</button>
+            <button class="btn btn-danger" @onclick="(()=>DeleteGroup(group))">Удалить группу</button>
         </div>
     }
 </div>
@@ -53,6 +54,14 @@
         groupName = string.Empty;
         groupDescription = string.Empty;
         return null;
+    }
+
+    private async void DeleteGroup(Group group)
+    {
+
+        groups.Remove(group);
+        await _groupsController.DeleteGroup(group.Id, _eventController);
+
     }
     [CascadingParameter]
     protected List<Group> groups { get; set; }

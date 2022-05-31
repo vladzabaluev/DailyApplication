@@ -40,22 +40,72 @@ namespace DailyApplication.Controllers
 
         #endregion Все группы пользователя
 
-        // GET: Groups/Details/5
-        public async Task<IActionResult> Details(int? id)
+        //// GET: Groups/Details/5
+        //public async Task<IActionResult> Details(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var @group = await _context.Group
+        //        .FirstOrDefaultAsync(m => m.Id == id);
+        //    if (@group == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return View(@group);
+        //}
+
+        // GET: Groups/Delete/5
+        public async Task<IActionResult> DeleteGroup(int? id, EventsController eventsController)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
-            var @group = await _context.Group
+            var removableGroup = await _context.Group
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (@group == null)
+            if (removableGroup == null)
             {
                 return NotFound();
             }
 
-            return View(@group);
+            //Удалить все ивенты группы
+            List<Event> removableGroupEvents = await _context.Event.Where(remGE => remGE.Group.Id == removableGroup.Id).ToListAsync();
+            foreach (Event removableEvent in removableGroupEvents)
+            {
+                await eventsController.DeleteEvent(removableEvent.Id);
+            }
+            //получать всех юзеров через юзер группы и у них удалять ссылки на юзер группы
+            //Удалить все юзер группы
+
+            List<UserGroup> removableUserGroups = await _context.UserGroup.Where(remGE => remGE.Group == removableGroup).ToListAsync();
+            //List<User> users = new List<User>();
+            //users.AddRange(await _context.User.Where(us => us.UserGroup != null).ToListAsync());//= ;
+            //foreach (User user in users)
+            //{
+            //    foreach (UserGroup userGroup in removableUserGroups)
+            //    {
+            //        foreach (UserGroup _userGrooups in user.UserGroup)
+            //        {
+            //            if (_userGrooups == userGroup)
+            //            {
+            //                user.UserGroup.Remove(_userGrooups);
+            //            }
+            //        }
+            //        _context.UserGroup.Remove(userGroup);
+            //    }
+            //}
+            foreach (UserGroup userGroup in removableUserGroups)
+            {
+                _context.UserGroup.Remove(userGroup);
+            }
+            //Удалить группу
+            _context.Group.Remove(removableGroup);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(EventsController.GetAllUserEvent));
         }
 
         #region Создание группы
@@ -82,84 +132,101 @@ namespace DailyApplication.Controllers
 
         #endregion Создание группы
 
-        // GET: Groups/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //// GET: Groups/Edit/5
+        //public async Task<IActionResult> Edit(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var @group = await _context.Group.FindAsync(id);
-            if (@group == null)
+        //    var @group = await _context.Group.FindAsync(id);
+        //    if (@group == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(@group);
+        //}
+
+        //// POST: Groups/Edit/5
+        //// To protect from overposting attacks, enable the specific properties you want to bind to.
+        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Group @group)
+        //{
+        //    if (id != @group.Id)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            _context.Update(@group);
+        //            await _context.SaveChangesAsync();
+        //        }
+        //        catch (DbUpdateConcurrencyException)
+        //        {
+        //            if (!GroupExists(@group.Id))
+        //            {
+        //                return NotFound();
+        //            }
+        //            else
+        //            {
+        //                throw;
+        //            }
+        //        }
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    return View(@group);
+        //}
+
+        //// GET: Groups/Delete/5
+        //public async Task<IActionResult> Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var @group = await _context.Group
+        //        .FirstOrDefaultAsync(m => m.Id == id);
+        //    if (@group == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return View(@group);
+        //}
+
+        //// POST: Groups/Delete/5
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteConfirmed(int id)
+        //{
+        //    var @group = await _context.Group.FindAsync(id);
+        //    _context.Group.Remove(@group);
+        //    await _context.SaveChangesAsync();
+        //    return RedirectToAction(nameof(Index));
+        //}
+
+        public async Task<bool> UserExists(string email)
+        {
+            DailyApplication.Models.User user = await _context.User.Where(requiredUser => requiredUser.Email == email).FirstOrDefaultAsync();
+            if (user != null)
             {
-                return NotFound();
+                return true;
             }
-            return View(@group);
+            else
+            {
+                return false;
+            }
         }
 
-        // POST: Groups/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Group @group)
+        public async Task SendNotification(User invitedUser)
         {
-            if (id != @group.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(@group);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!GroupExists(@group.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(@group);
-        }
-
-        // GET: Groups/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var @group = await _context.Group
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (@group == null)
-            {
-                return NotFound();
-            }
-
-            return View(@group);
-        }
-
-        // POST: Groups/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var @group = await _context.Group.FindAsync(id);
-            _context.Group.Remove(@group);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool GroupExists(int id)
