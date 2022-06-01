@@ -1,0 +1,103 @@
+﻿@inject DailyApplication.Controllers.GroupsController _groupsController;
+
+@if(Edit)
+{
+    <div class="modal-header">
+        <h5 class="modal-title">@groups[Index].Name</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick=Toggle>
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p class="font-weight-bold">Описание:</p>
+        <div class="my-1">
+            @if (groups[Index].Description != null && groups[Index].Description != "")
+            {
+                <p class="card-text">
+                    @groups[Index].Description
+                </p>
+            }
+            else
+            {
+                <p class="card-text">
+                    Нет описания
+                </p>
+            }
+        </div>
+        <div class="form-group">
+            <p class="font-weight-bold">Пользователи:</p>
+        </div>
+        <form>
+            <div class="form-group">
+                <label class="control-label">Название</label>
+                <input class="form-control" placeholder="Название" @bind=groupName />
+                <span class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Описание</label>
+                <input type="text" class="form-control" placeholder="Описание" @bind=groupDescription />
+                <span class="text-danger"></span>
+            </div>
+            <input type="submit" class="btn btn-outline-dark mt-1 mb-3" value="Создать группу" @onclick=Create @onclick:preventDefault></input>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="(() => Edit = !Edit)">Изменить</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="(() => {
+            Delete.InvokeAsync(groups[Index]);
+            Toggle.InvokeAsync();
+            })">Удалить</button>
+    </div>
+}
+else
+{
+    <div class="modal-header">
+        <h5 class="modal-title">@groups[Index].Name</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick=Toggle>
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p class="font-weight-bold">Описание:</p>
+        <div class="my-1">
+            @if (groups[Index].Description != null && groups[Index].Description != "")
+            {
+                <p class="card-text">
+                    @groups[Index].Description
+                </p>
+            }
+            else
+            {
+                <p class="card-text">
+                    Нет описания
+                </p>
+            }
+        </div>
+        <div class="form-group">
+            <p class="font-weight-bold">Пользователи:</p>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="(() => Edit = !Edit)">Изменить</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="(() => {
+            Delete.InvokeAsync(groups[Index]);
+            Toggle.InvokeAsync();
+            })">Удалить</button>
+    </div>
+}
+
+@code {
+    [CascadingParameter]
+    protected List<Group> groups { get; set; }
+
+    [Parameter]
+    public int Index { get; set; }
+    
+    [Parameter]
+    public EventCallback Toggle { get; set; }
+    
+    [Parameter]
+    public EventCallback<Group> Delete { get; set; }
+
+    private bool Edit = false;
+}

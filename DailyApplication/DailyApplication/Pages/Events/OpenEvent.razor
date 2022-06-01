@@ -81,6 +81,7 @@ else
             }
         </div>
         <hr />
+        <p class="font-weight-bold">Подсобытия:</p>
         <div class="my-1">
             @if (Item_subs != null)
             {
@@ -102,7 +103,9 @@ else
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick=Change>Изменить</button>
-        <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="(() => Delete.InvokeAsync(Item))">Удалить</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="(() => {Delete.InvokeAsync(Item);
+            Toggle.InvokeAsync();
+        })">Удалить</button>
     </div>
 }
 
@@ -145,11 +148,6 @@ else
     private void Change()
     {
         edit = !edit;
-    }
-
-    private void Done()
-    {
-
     }
 
     [Parameter]
