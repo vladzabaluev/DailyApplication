@@ -26,6 +26,33 @@
             <input @bind:format="yyyy-MM-ddTHH:mm" type="datetime-local" class="form-control" placeholder="Время окончания" @bind=Item.DeadlineTime />
             <span class="text-danger"></span>
         </div>
+        <p class="font-weight-bold">Команда:</p>
+        <div class="form-group">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" @onclick="(()=>show = !show)">
+                    @eventGroupName
+                </button>
+                <div class="dropdown-menu @showDropDown" aria-labelledby="dropdownMenuButton">
+                    <div class="dropdown-item" @onclick="@(() => {
+                                                               Item.Group = null;
+                                                               eventGroupName = "Команда";
+                                                               show = false;
+                                                           })">
+                        Нет команды
+                    </div>
+                    @foreach (var group in groups)
+                    {
+                        <div class="dropdown-item" @onclick="(() => {
+                                                                 Item.Group = group;
+                                                                 eventGroupName = group.Name;
+                                                                 show = false;
+                                                             })">
+                            @group.Name
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
         <label class="control-label">Подсобытия:</label>
         <div class="form-group">
             @for (int i = 0; i < Item_subs.Count; i++)
@@ -81,6 +108,12 @@ else
             }
         </div>
         <hr />
+        <p class="font-weight-bold">Команда:</p>
+        <div class="form-group">
+            <div class="alert alert-secondary">
+                @eventGroupName
+            </div>
+        </div>
         <p class="font-weight-bold">Подсобытия:</p>
         <div class="my-1">
             @if (Item_subs != null)
@@ -110,13 +143,21 @@ else
 }
 
 @code {
+    [CascadingParameter(Name = "groups")]
+    protected List<Group> groups { get; set; }
+
     [Parameter]
     public Event Item { get; set; }
 
     [Parameter]
     public EventCallback Toggle { get; set; }
 
+    private string eventGroupName;
     public List<Sub_event> Item_subs { get; set; }
+
+    private bool show = false;
+    #nullable enable
+    private string? showDropDown => show ? "show" : null;
 
     private bool edit = false;
 
@@ -137,6 +178,8 @@ else
 
     protected override void OnInitialized()
     {
+        if (Item.Group != null) eventGroupName = Item.Group.Name;
+        else eventGroupName = "Нет команды";
         if (_eventController.GetEventSubEvents(Item.Id) != null)
             Item_subs = _eventController.GetEventSubEvents(Item.Id);
 

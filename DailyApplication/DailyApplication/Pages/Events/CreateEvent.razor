@@ -58,16 +58,9 @@
             <div class="form-group">
                 @for (int i = 0; i < subEventList.Count; i++)
                 {
-                    @*<input value="@subEventList[i]" @onchange="((ChangeEventArgs __e) => OneSub(__e.Value.ToString(), i))"  class="alert alert-secondary" role="alert" />*@
-                    @*<div class="alert alert-secondary" role="alert">@subEventList[i]</div>*@
                     <Input SubEvents="@subEventList" Index="@i" CallBack="@((value) => subEventList = value)" />
                 }
                 <input class="form-control" placeholder="Подсобытие" @bind=GetSubEvent />
-                @*<input class="form-control" value="@currentSubEventName" placeholder="Название" @onchange="((ChangeEventArgs __e)=> { currentSubEventName = __e.Value.ToString();
-                        subEventList.Add(currentSubEventName);
-                        currentSubEventName = string.Empty;
-                        __e.Value= string.Empty;
-                    })" />*@
                 <span class="text-danger"></span>
             </div>
         </div>
