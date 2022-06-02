@@ -1,11 +1,16 @@
-﻿<div class="modal mt-5" tabindex="-1" role="dialog" style="display:flex;" @onmousedown=Toggle>
+﻿<div class="modal mt-5" tabindex="-1" role="dialog" style="display:@Display;" @onmousedown=Toggle>
     <div class="modal-dialog" role="document" @onmousedown:stopPropagation>
         <div class="modal-content" style="min-width:600px;">
             @ChildContent
         </div>
     </div>
 </div>
-<div class="modal-backdrop fade show"></div>
+
+
+@if (ShowBackDrop)
+{
+    <div class="modal-backdrop fade show" style="@ShowBackDropOpacity"></div>
+}
 
 
 @code {
@@ -13,5 +18,18 @@
     public RenderFragment ChildContent { get; set; }
     
     [Parameter]
+    public string ShowBackDropOpacity { get; set; }
+
+    [Parameter]
+    public bool Collapse { get; set; }
+
+    [Parameter]
     public EventCallback Toggle { get; set; }
+
+    //private bool ShowBackDrop = false;
+
+    #nullable enable
+    private string? Display => Collapse ? "flex" : "none";
+    private bool ShowBackDrop => Collapse ? true : false;
+
 }
