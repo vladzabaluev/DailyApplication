@@ -81,7 +81,7 @@
 </form>
 
 @code {
-    [CascadingParameter]
+    [CascadingParameter(Name = "groups")]
     protected List<Group> groups { get; set; }
     private bool show = false;
     #nullable enable
