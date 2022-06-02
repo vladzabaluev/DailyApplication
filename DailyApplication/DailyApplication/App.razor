@@ -3,18 +3,20 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <CascadingAuthenticationState>
-    <CascadingValue Value="@groups">
-        <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
-            <Found Context="routeData">
-                <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-            </Found>
-            <NotFound>
-                <LayoutView Layout="@typeof(MainLayout)">
-                    <h1>Error404</h1>
-                    <p>Sorry, there's nothing at this address.</p>
-                </LayoutView>
-            </NotFound>
-        </Router>
+    <CascadingValue Value="@groups" Name="groups">
+        <CascadingValue Value="@invites" Name="invites">
+            <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
+                <Found Context="routeData">
+                    <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                </Found>
+                <NotFound>
+                    <LayoutView Layout="@typeof(MainLayout)">
+                        <h1>Error404</h1>
+                        <p>Sorry, there's nothing at this address.</p>
+                    </LayoutView>
+                </NotFound>
+            </Router>
+        </CascadingValue>
     </CascadingValue>
 </CascadingAuthenticationState>
 
@@ -24,6 +26,7 @@
     private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     private List<Group> groups = new();
+    private List<Group> invites = new();
 
     protected async override Task OnInitializedAsync()
     {
@@ -31,5 +34,12 @@
         ClaimsPrincipal currentUser = currentAuth.User;
 
         groups = _groupsController.GetUserGroups(currentUser);
+
+        invites = await _groupsController.GetAllInvites(currentUser);
+        //foreach (var gr in groups)
+        //{
+        //    Console.WriteLine(gr.Id);
+        //}
     }
+
 }

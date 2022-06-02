@@ -1,4 +1,6 @@
-﻿<div class="modal-header">
+﻿@inject DailyApplication.Controllers.GroupsController _groupsController
+
+<div class="modal-header">
     <h5 class="modal-title">Пригласить пользователя:</h5>
     <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick=Toggle>
         <span aria-hidden="true">&times;</span>
@@ -13,12 +15,25 @@
     </div>
 </div>
 <div class="modal-footer">
+    <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="(() => 
+{
+Send(email, Group);
+Toggle.InvokeAsync();
+})">Пригласить</button>
     <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick=Toggle>Отмена</button>
 </div>
 
 @code {
     [Parameter]
     public EventCallback Toggle { get; set; }
+    
+    [Parameter]
+    public Group Group { get; set; }
 
     private string email;
+
+    private async void Send(string email, Group group)
+    {
+        await _groupsController.InviteUser(email, group);
+    }
 }

@@ -14,8 +14,5 @@ namespace DailyApplication.Models
 
         public List<Event> Events { get; set; }
 
-        public Group()
-        {
-        }
     }
 }

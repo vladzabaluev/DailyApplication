@@ -19,19 +19,26 @@
 
 <h1 class="display-4 my-2">Доступные группы:</h1>
 
-<div>
-    @for (int index = 0; index < groups.Count; index++)
-    {
-        <GroupBox Index=index Delete=DeleteGroup/>
-    }
-</div>
+@if(groups.Count == 0)
+{
+    <p>Нет доступных групп</p>
+}
+else
+{
+    <div>
+        @for (int index = 0; index < groups.Count; index++)
+        {
+            <GroupBox Index=index Delete=DeleteGroup/>
+        }
+    </div>
+}
 
 @code {
     private string groupName = "";
     private string groupDescription;
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
-    [CascadingParameter]
+    [CascadingParameter(Name = "groups")]
     protected List<Group> groups { get; set; }
 
     private async Task<Group> Create()

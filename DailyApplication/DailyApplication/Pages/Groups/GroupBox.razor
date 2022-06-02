@@ -10,7 +10,7 @@
 @if (InviteModal)
 {
     <Modal Toggle="@(() => InviteModal = !InviteModal)">
-        <SendInvite Toggle="@(() => InviteModal = !InviteModal)" />
+        <SendInvite Toggle="@(() => InviteModal = !InviteModal)" Group=groups[Index]/>
     </Modal>
 }
 
@@ -34,7 +34,7 @@
 </div>
 
 @code {
-    [CascadingParameter]
+    [CascadingParameter(Name = "groups")]
     protected List<Group> groups { get; set; }
 
     [Parameter]
