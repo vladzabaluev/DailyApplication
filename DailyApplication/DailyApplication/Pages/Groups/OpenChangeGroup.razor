@@ -39,11 +39,14 @@
             </div>
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="(() => Edit = !Edit)">Изменить</button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="(() => {
-                Delete.InvokeAsync(groups[Index]);
-                Toggle.InvokeAsync();
-                })">Удалить</button>
+            <div>
+                <input type="submit" value="Изменить" class="btn btn-primary" @onclick="(() => {
+                                                                                                    changeGroup(groups[Index]);
+                                                                                                    Edit = !Edit;
+                                                                                                    Toggle.InvokeAsync(DateTime.Now);
+                                                                                               })" @onclick:preventDefault />
+            </div>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="(() => Edit = !Edit)">Отмена</button>
         </div>
     </form>
 }
@@ -73,10 +76,10 @@ else
         </div>
         <div class="form-group">
             <p class="font-weight-bold">Пользователи:</p>
-            @foreach(var user in Users)
-            {
-                <p>@user</p>
-            }
+                @foreach(var user in Users)
+                {
+                    <p>@user</p>
+                }
         </div>
     </div>
     <div class="modal-footer">
@@ -101,12 +104,17 @@ else
     [Parameter]
     public EventCallback<Group> Delete { get; set; }
 
-    private List<User> Users;
+    private List<User> Users = new();
 
     private bool Edit = false;
 
     protected async override Task OnInitializedAsync()
     {
         Users = await _groupsController.GetAllUsersInGroup(groups[Index]);
+    }
+
+    private async void changeGroup(Group group)
+    {
+        await _groupsController.EditGroup(group.Id, group);
     }
 }

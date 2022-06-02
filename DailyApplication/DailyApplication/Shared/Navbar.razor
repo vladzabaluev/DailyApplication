@@ -1,9 +1,10 @@
-﻿@inject DailyApplication.Controllers.GroupsController _groupsController
+﻿@using System.Security.Claims
+@inject DailyApplication.Controllers.GroupsController _groupsController
 
 @if(OpenInvite)
 {
     <Modal Toggle="(() => OpenInvite = !OpenInvite)" >
-        <OpenInvite Toggle="(() => OpenInvite = !OpenInvite)" Group=OpenGroup />
+        <OpenInvite Toggle="(() => OpenInvite = !OpenInvite)" Group=OpenGroup Accept=Accept Deny=Deny/>
     </Modal>
 }
 
@@ -44,15 +45,23 @@
                                     @invites.Count
                                 </button>
                                 <div class="dropdown-menu @showDropDown" aria-labelledby="dropdownMenuButton">
-                                    @*@if (userGroups.user)*@
-                                    @foreach (var group in invites)
+                                    @if(invites.Count == 0)
                                     {
-                                        <div class="dropdown-item" @onclick="(() => {
-                                            OpenGroup = group;
-                                            OpenInvite = !OpenInvite;
-                                            })">
-                                            @group.Name
+                                        <div class="dropdown-item" @onclick="(()=>show = !show)">
+                                            Нет приглашений
                                         </div>
+                                    }
+                                    else
+                                    {
+                                        foreach (var group in invites)
+                                        {
+                                            <div class="dropdown-item" @onclick="(() => {
+                                                OpenGroup = group;
+                                                OpenInvite = !OpenInvite;
+                                                })">
+                                                @group.Name
+                                            </div>
+                                        }
                                     }
                                 </div>
                             </div>
@@ -66,9 +75,14 @@
 </header>
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     [CascadingParameter(Name = "invites")]
     public List<Group> invites { get; set; }
+    
+    [CascadingParameter(Name = "groups")]
+    public List<Group> groups { get; set; }
 
     private bool show = false;
     #nullable enable
@@ -83,6 +97,31 @@
         collapseNavMenu = !collapseNavMenu;
     }
 
+    ClaimsPrincipal? currentUser;
+
+    protected async override Task OnInitializedAsync()
+    {
+        AuthenticationState currentAuth = await authenticationStateTask;
+        currentUser = currentAuth.User;
+    }
+
     private bool OpenInvite = false;
-    private Group OpenGroup;
+    private Group? OpenGroup;
+
+    private async void Accept(Group group)
+    {
+        invites.Remove(group);
+        if (invites.Count == 0)
+            show = !show;
+        groups.Add(group);
+        await _groupsController.UserAgree(currentUser, group);
+    }
+
+    private async void Deny(Group group)
+    {
+        invites.Remove(group);
+        if (invites.Count == 0)
+            show = !show;
+        await _groupsController.UserDisagree(currentUser, group);
+    }
 }

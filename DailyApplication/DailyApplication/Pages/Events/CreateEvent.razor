@@ -127,7 +127,6 @@
 
         if (!string.IsNullOrWhiteSpace(eventName))
         {
-            Console.WriteLine(eventGroup);
             Event newEvent = _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline, subEventList, currentGroup);
 
             await Create.InvokeAsync(newEvent);
@@ -140,9 +139,5 @@
             subEventList.Clear();
         }
 
-    }
-    protected override void OnParametersSet()
-    {
-        Console.WriteLine(eventGroup);
     }
 }
