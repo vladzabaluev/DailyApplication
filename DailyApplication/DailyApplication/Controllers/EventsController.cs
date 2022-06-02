@@ -31,7 +31,7 @@ namespace DailyApplication.Controllers
 
         //Созда событие(сделать асинхронным)
         public Event CreateEvent(string Name, string Description, ClaimsPrincipal User, DateTime DeadlineTime, List<Sub_event> subEvents, Group group)
-        { 
+        {
             Event newEvent = new Event()
             {
                 Name = Name,
@@ -95,6 +95,7 @@ namespace DailyApplication.Controllers
             List<Event> events = new List<Event>();
             events.AddRange(GetUserEvents(user));
             events.AddRange(GetGroupEvents(user));
+            events = events.Distinct().ToList();
             SortByTime(events);
             return events;
         }
