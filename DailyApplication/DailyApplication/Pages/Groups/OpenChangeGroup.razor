@@ -73,6 +73,10 @@ else
         </div>
         <div class="form-group">
             <p class="font-weight-bold">Пользователи:</p>
+            @foreach(var user in Users)
+            {
+                <p>@user</p>
+            }
         </div>
     </div>
     <div class="modal-footer">
@@ -90,12 +94,19 @@ else
 
     [Parameter]
     public int Index { get; set; }
-    
+
     [Parameter]
     public EventCallback Toggle { get; set; }
-    
+
     [Parameter]
     public EventCallback<Group> Delete { get; set; }
 
+    private List<User> Users;
+
     private bool Edit = false;
+
+    protected async override Task OnInitializedAsync()
+    {
+        Users = await _groupsController.GetAllUsersInGroup(groups[Index]);
+    }
 }

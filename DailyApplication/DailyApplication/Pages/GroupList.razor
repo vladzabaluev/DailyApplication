@@ -74,6 +74,6 @@ else
         AuthenticationState currentAuth = await authenticationStateTask;
         ClaimsPrincipal currentUser = currentAuth.User;
         groups.Remove(group);
-        await _groupsController.Exit(currentUser, group);
+        await _groupsController.Exit(currentUser, group, _eventsController);
     }
 }
