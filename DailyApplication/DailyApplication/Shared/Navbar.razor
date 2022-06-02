@@ -39,12 +39,12 @@
                                 <div class="dropdown-menu @showDropDown" aria-labelledby="dropdownMenuButton">
                                     <div class="dropdown-item" @onclick="@(() => show = false)">
                                         @*@if (userGroups.user)*@
-                                        @*@foreach (var group in invites)
+                                        @foreach (var group in invites)
                                         {
                                             <div>
                                                 @group.Name
                                             </div>
-                                        }*@
+                                        }
                                     </div>
                                 </div>
                             </div>

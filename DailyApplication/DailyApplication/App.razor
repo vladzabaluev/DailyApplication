@@ -36,10 +36,10 @@
         groups = _groupsController.GetUserGroups(currentUser);
 
         invites = await _groupsController.GetAllInvites(currentUser);
-        //foreach (var gr in groups)
-        //{
-        //    Console.WriteLine(gr.Id);
-        //}
+        foreach (var gr in groups)
+        {
+            Console.WriteLine(gr.Id);
+        }
     }
 
 }

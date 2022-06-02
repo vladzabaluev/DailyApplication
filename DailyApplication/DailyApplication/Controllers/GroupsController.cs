@@ -3,6 +3,7 @@ using DailyApplication.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -29,21 +30,14 @@ namespace DailyApplication.Controllers
             User currentUser = _userManager.GetUserAsync(User).Result; //найду текущего пользователя
 
             List<UserGroup> UserGroups = _context.UserGroup.Where
-                (findGroup => findGroup.User == currentUser /*&& findGroup.UserIsInGroup == true*/).ToList();
+                (findGroup => findGroup.User == currentUser && findGroup.UserIsInGroup == true).Include("Group").ToList();
             //найду все ЮзерГруппы, связанные с нашим юзером
 
-            #region Magic
-
-            foreach (UserGroup userGroup in UserGroups)
+            foreach (UserGroup ug in UserGroups) //благодаря юзергруппам найду все группы пользователя
             {
-                _context.Group.FirstOrDefault(foundGroup => foundGroup.Id == userGroup.Id);
-            }
-
-            #endregion Magic
-
-            foreach (UserGroup group in UserGroups) //благодаря юзергруппам найду все группы пользователя
-            {
-                Groups.Add(_context.Group.FirstOrDefault(foundGroup => foundGroup == group.Group));
+                Group gr = new();
+                
+                Groups.Add(_context.Group.FirstOrDefault(foundGroup => foundGroup.Id == ug.Group.Id));
             }
             return Groups;
         }
@@ -205,7 +199,7 @@ namespace DailyApplication.Controllers
         public async Task<List<Group>> GetAllInvites(ClaimsPrincipal user)
         {
             List<UserGroup> userGroupWasUserInvited = await _context.UserGroup.Where(usGr =>
-                   usGr.User == _userManager.GetUserAsync(user).Result && usGr.UserIsInGroup == false).ToListAsync();
+                   usGr.User == _userManager.GetUserAsync(user).Result && usGr.UserIsInGroup == false).Include("Group").ToListAsync();
             List<Group> groupWasUserInvited = new List<Group>();
             foreach (UserGroup userGroup in userGroupWasUserInvited)
             {
