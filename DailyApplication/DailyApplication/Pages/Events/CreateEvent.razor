@@ -95,15 +95,12 @@
         get => currentSubEventName;
         set
         {
-            subEventList.Add(new Sub_event() { 
-                Description = value, 
-                isDone = false
-            });
+            subEventList.Add(value);
             currentSubEventName = "";
         }
     }
 
-    List<Sub_event> subEventList = new List<Sub_event>();
+    List<string> subEventList = new List<string>();
 
     [Parameter]
     public EventCallback<DateTime> Toggle { get; set; }

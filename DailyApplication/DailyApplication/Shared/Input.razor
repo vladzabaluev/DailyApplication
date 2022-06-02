@@ -1,42 +1,23 @@
-﻿@inject DailyApplication.Controllers.EventsController _eventController;
-
-<div>
-    <input @bind="@ChangeSub" class="alert alert-secondary" role="alert" />
-    <CheckBox Index=Index SubEvents=SubEvents cb=DoneSub/>
-    <button class="btn btn-danger" @onclick="(() => DeleteSub(SubEvents[Index]))">Удалить</button>
-</div>
+﻿<input @bind="@ChangeSub" class="alert alert-secondary" role="alert" />
 
 @code {
     [Parameter]
-    public List<Sub_event> SubEvents { get; set; }
+    public List<string> SubEvents { get; set; }
 
     [Parameter]
     public int Index { get; set; }
 
     [Parameter]
-    public EventCallback<List<Sub_event>> CallBack { get; set; }
-
+    public EventCallback<List<string>> CallBack { get; set; }
 
     private string ChangeSub
     {
-        get => SubEvents[Index].Description;
+        get => SubEvents[Index];
         set
         {
-            SubEvents[Index].Description = value;
+            SubEvents[Index] = value;
             CallBack.InvokeAsync(SubEvents);
         }
-    }
 
-    private void DoneSub (bool isDone)
-    {
-        SubEvents[Index].isDone = isDone;
-        CallBack.InvokeAsync(SubEvents);
-    }
-
-    private async void DeleteSub (Sub_event subEvent)
-    {
-        await _eventController.DeleteEventSubEvents(subEvent.Id);
-        SubEvents.Remove(subEvent);
-        await CallBack.InvokeAsync(SubEvents);
     }
 }

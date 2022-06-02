@@ -1,11 +1,8 @@
 ﻿@inject DailyApplication.Controllers.EventsController EventService;
 
-@if (ModalOpen)
-{
-    <Modal Toggle=ToggleModalOpen>
-        <OpenEvent Toggle=ToggleModalOpen Item=Item Delete=DeleteEvent/>
-    </Modal>
-}
+<Modal Collapse=CollapseModalOpen Toggle=ToggleModalOpen>
+    <OpenEvent Toggle=ToggleModalOpen Item=Item Delete=DeleteEvent/>
+</Modal>
 <div class="container border-top event overflow-hidden" @onmouseover=ToggleDelBtn @onmouseout=ToggleDelBtn>
     <div class="row">
         <div class="col-10 px-0" @onclick="ToggleModalOpen">
@@ -37,11 +34,11 @@
     public EventCallback<Event> DeleteEvent { get; set; }
     
     #region Просмотр события
-    private bool ModalOpen = false;
+    private bool CollapseModalOpen = false;
 
     private void ToggleModalOpen()
     {
-        ModalOpen = !ModalOpen;
+        CollapseModalOpen = !CollapseModalOpen;
     }
     #endregion
 }

@@ -28,13 +28,11 @@
         </div>
         <label class="control-label">Подсобытия:</label>
         <div class="form-group">
-            @for (int i = 0; i < Item_subs.Count; i++)
+            @for (int i = 0; i < tempSubEvents.Count; i++)
             {
                 @*<input value="@subEventList[i]" @onchange="((ChangeEventArgs __e) => OneSub(__e.Value.ToString(), i))"  class="alert alert-secondary" role="alert" />*@
                 @*<div class="alert alert-secondary" role="alert">@subEventList[i]</div>*@
-                <div>
-                    <Input SubEvents="@Item_subs" Index="@i" CallBack="@((value) => Item_subs = value)" />
-                </div>
+                <Input SubEvents="@tempSubEvents" Index="@i" CallBack="@((value) => tempSubEvents = value)" />
             }
             <input class="form-control" placeholder="Подсобытие" @bind=GetSubEvent />
             @*<input class="form-control" value="@currentSubEventName" placeholder="Название" @onchange="((ChangeEventArgs __e)=> { currentSubEventName = __e.Value.ToString();
@@ -81,7 +79,6 @@ else
             }
         </div>
         <hr />
-        <p class="font-weight-bold">Подсобытия:</p>
         <div class="my-1">
             @if (Item_subs != null)
             {
@@ -103,9 +100,7 @@ else
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick=Change>Изменить</button>
-        <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="(() => {Delete.InvokeAsync(Item);
-            Toggle.InvokeAsync();
-        })">Удалить</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="(() => Delete.InvokeAsync(Item))">Удалить</button>
     </div>
 }
 
@@ -127,10 +122,7 @@ else
         get => currentSubEventName;
         set
         {
-            Item_subs.Add(new Sub_event() { 
-                Description = value, 
-                isDone = false
-            });
+            tempSubEvents.Add(value);
             currentSubEventName = "";
         }
     }
@@ -155,7 +147,6 @@ else
 
     private async void changeEvent(Event editedEvent)
     {
-        editedEvent.SubEvents = Item_subs;
         await _eventController.Edit(editedEvent.Id, editedEvent);
     }
 }

@@ -30,8 +30,19 @@ namespace DailyApplication.Controllers
         #region Создать ивент
 
         //Созда событие(сделать асинхронным)
-        public Event CreateEvent(string Name, string Description, ClaimsPrincipal User, DateTime DeadlineTime, List<Sub_event> subEvents, Group group)
-        { 
+        public Event CreateEvent(string Name, string Description, ClaimsPrincipal User, DateTime DeadlineTime, List<string> subEvents, Group group)
+        {
+            List<Sub_event> tempSubEv = new List<Sub_event>();
+            foreach (string descValue in subEvents)
+            {
+                Sub_event createdSubEvent = new Sub_event()
+                {
+                    Description = descValue,
+                    isDone = false
+                };
+                tempSubEv.Add(createdSubEvent);
+            }
+
             Event newEvent = new Event()
             {
                 Name = Name,
@@ -39,7 +50,7 @@ namespace DailyApplication.Controllers
                 User = _userManager.GetUserAsync(User).Result,
                 DeadlineTime = DeadlineTime,
                 Group = group,
-                SubEvents = subEvents,
+                SubEvents = tempSubEv,
                 IsDone = false
             };
             _context.Event.Add(newEvent);
