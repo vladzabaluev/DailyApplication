@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using DailyApplication.Data;
+﻿using DailyApplication.Data;
 using DailyApplication.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace DailyApplication.Controllers
 {
@@ -99,56 +97,33 @@ namespace DailyApplication.Controllers
 
         #endregion Создание группы
 
-        //// GET: Groups/Edit/5
-        //public async Task<IActionResult> Edit(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var @group = await _context.Group.FindAsync(id);
-        //    if (@group == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(@group);
-        //}
-
-        //// POST: Groups/Edit/5
-        //// To protect from overposting attacks, enable the specific properties you want to bind to.
-        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Group @group)
-        //{
-        //    if (id != @group.Id)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(@group);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!GroupExists(@group.Id))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    return View(@group);
-        //}
+        public async Task<IActionResult> EditGroup(int id, [Bind("Id,Name,Description")] Group group)
+        {
+            if (id != @group.Id)
+            {
+                return NotFound();
+            }
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(@group);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!GroupExists(@group.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+            return RedirectToAction(nameof(GetUserGroups));
+        }
 
         public async Task<bool> UserExists(string email)
         {
@@ -200,11 +175,38 @@ namespace DailyApplication.Controllers
             }
         }
 
-        public async Task<List<UserGroup>> GetAllInvites(ClaimsPrincipal user)
+        public async Task Exit(ClaimsPrincipal user, Group group)
         {
-            List<UserGroup> groupWasUserInvited = await _context.UserGroup.Where(usGr =>
+            UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(usGr => usGr.Group == group
+                    && usGr.User == _userManager.GetUserAsync(user).Result);
+            if (userGroup != null)
+            {
+                _context.UserGroup.Remove(userGroup);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<Group>> GetAllInvites(ClaimsPrincipal user)
+        {
+            List<UserGroup> userGroupWasUserInvited = await _context.UserGroup.Where(usGr =>
                    usGr.User == _userManager.GetUserAsync(user).Result && usGr.UserIsInGroup == false).ToListAsync();
+            List<Group> groupWasUserInvited = new List<Group>();
+            foreach (UserGroup userGroup in userGroupWasUserInvited)
+            {
+                groupWasUserInvited.Add(await _context.Group.FirstOrDefaultAsync(gr => gr.Id == userGroup.Id));
+            }
             return groupWasUserInvited;
+        }
+
+        public async Task<List<User>> GetAllUsersInGroup(Group group)
+        {
+            List<User> usersInGroup = new List<User>();
+            List<UserGroup> userGroups = await _context.UserGroup.Where(usGr => usGr.Group == group).ToListAsync();
+            foreach (UserGroup ug in userGroups)
+            {
+                usersInGroup.Add(ug.User);
+            }
+            return usersInGroup;
         }
 
         private bool GroupExists(int id)
