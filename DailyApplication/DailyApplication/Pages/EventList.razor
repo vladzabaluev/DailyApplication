@@ -7,13 +7,27 @@
 @inject DailyApplication.Controllers.GroupsController _groupController;
 
 <h1>События</h1>
-<Modal Collapse="@CollapseModalCreate" Toggle="@(() => ToggleModalCreate(DateTime.Now))">
-    <CreateEvent Toggle="@(() => ToggleModalCreate(DateTime.Now))" Create="@CreateEvent" eventDeadline="@CreateDeadlineTime" />
-</Modal>
+@if (ModalCreate)
+{
+    <Modal Toggle="@(() => ToggleModalCreate(DateTime.Now))">
+        <CreateEvent Toggle="@(() => ToggleModalCreate(DateTime.Now))" Create="@CreateEvent" eventDeadline="@CreateDeadlineTime" />
+    </Modal>
+}
 <div class="d-flex justify-content-between">
     <button class="btn btn-outline-dark mt-1 mb-3" @onclick="@(() => ToggleModalCreate(DateTime.Now))">Создать</button>
     <div>
-        <DateSelector Week="@week" IncrementWeek="@InWeek" DecrementWeek="@DeWeek" />
+        @if (view == "W")
+        {
+            <DateSelector Date="@WeekDate" Increment="@InWeek" Decrement="@DeWeek" />
+        }
+        @if (view == "M")
+        {
+            <DateSelector Date="@month[15].ToString("MMMM")" Increment="@InMonth" Decrement="@DeMonth" />
+        }
+        @if (view == "D")
+        {
+            <DateSelector Date="@day.ToString()" Increment="@InDay" Decrement="@DeDay" />
+        }
         <ViewSelect View=setView />
     </div>
 </div>
@@ -23,17 +37,32 @@
     <div class="row mx-0">
         @for (int weekDay = 0; weekDay < 7; weekDay++)
         {
-            <EventDayList events=@events week=@week weekDay=@weekDay OpenCreateBox=@ToggleModalCreate />
+            <WeekView events=@events week=@week weekDay=@weekDay OpenCreateBox=@ToggleModalCreate />
         }
     </div>
 }
 @if (view == "M")
 {
-    <h1>MONTH</h1>
+    <div class="row mx-0">
+        @for (int weekNum = 0, day = 0; weekNum < 6; weekNum++)
+        {
+            <div class="row mx-0" style="width:100%;">
+                @for(int weekDay = 0; weekDay < 7; weekDay++)
+                {
+                    <div class="col py-2" style="width:14.28%;">
+                        <MonthView Date=month[day] Events=@events WeekDay=@weekDay OpenCreateBox=@ToggleModalCreate/>
+                    </div>
+                    day++;
+                }
+            </div>
+        }
+    </div>
 }
 @if (view == "D")
 {
-    <h1>DAY</h1>
+    <div class="row mx-0">
+        <DayView  Events=@events Date=@day OpenCreateBox=@ToggleModalCreate />
+    </div>
 }
 
 @code
@@ -44,6 +73,8 @@
         view = newView;
     }
     DateTime[] week = new DateTime[7];
+    DateTime[] month = new DateTime[42];
+    DateTime day = DateTime.Today;
     CultureInfo myCI = new CultureInfo("en-US");
     protected override void OnInitialized()
     {
@@ -60,9 +91,13 @@
         }
 
         var DateInit = new DateTime(DateTime.Now.Year, 1, 1, 0, 0, 0);
+        var DateMnthInit = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1, 0, 0, 0);
         DateInit = GetFirstDateOfWeek(DateInit, DayOfWeek.Monday);
+        DateMnthInit = GetFirstDateOfWeek(DateMnthInit, DayOfWeek.Monday);
         DateInit = myCI.Calendar.AddWeeks(DateInit, myCI.Calendar.GetWeekOfYear(DateTime.Now.AddDays(-1), myCWR, myFirstDOW) - 1);
         week = weekInit(DateInit);
+        month = monthInit(DateMnthInit);
+        WeekDate = $"{@week[0].ToString("m")} - {@week[6].ToString("m")}";
     }
 
     private DateTime[] weekInit(DateTime DateInit)
@@ -76,28 +111,61 @@
         return week;
     }
 
-    // Селектор недель
-    #region
+    private DateTime[] monthInit(DateTime DateMnthInit)
+    {
+        DateTime[] month = new DateTime[42];
+        month[0] = DateMnthInit;
+        for (int i = 1; i < 42; i++)
+        {
+            month[i] = month[i - 1].AddDays(1);
+        }
+        return month;
+    }
 
+    // Селектор
+    #region
+    private string WeekDate;
     void InWeek()
     {
         week = weekInit(myCI.Calendar.AddWeeks(week[0], +1));
+        WeekDate = $"{@week[0].ToString("m")} - {@week[6].ToString("m")}";
     }
 
     void DeWeek()
     {
         week = weekInit(myCI.Calendar.AddWeeks(week[0], -1));
+        WeekDate = $"{@week[0].ToString("m")} - {@week[6].ToString("m")}";
+    }
+
+    void InMonth()
+    {
+        month = monthInit(myCI.Calendar.AddMonths(month[0], +1));
+    }
+
+    void DeMonth()
+    {
+        month = monthInit(myCI.Calendar.AddMonths(month[0], -1));
+    }
+
+    void InDay()
+    {
+        day = myCI.Calendar.AddDays(day, +1);
+    }
+
+    void DeDay()
+    {
+        day = myCI.Calendar.AddDays(day, -1);
     }
     #endregion
 
     #region Создание события
-    private bool CollapseModalCreate = false;
+    private bool ModalCreate = false;
     private DateTime CreateDeadlineTime;
 
     private void ToggleModalCreate(DateTime DeadlineTime)
     {
         CreateDeadlineTime = DeadlineTime;
-        CollapseModalCreate = !CollapseModalCreate;
+        ModalCreate = !ModalCreate;
     }
 
     private void CreateEvent(Event newEvent)

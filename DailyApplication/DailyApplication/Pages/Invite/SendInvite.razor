@@ -1,0 +1,24 @@
+﻿<div class="modal-header">
+    <h5 class="modal-title">Пригласить пользователя:</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick=Toggle>
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <div class="text-danger"></div>
+    <div class="form-group">
+        <label class="control-label">E-mail пользователя:</label>
+        <input class="form-control" placeholder="Название" @bind=email />
+        <span class="text-danger"></span>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick=Toggle>Отмена</button>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback Toggle { get; set; }
+
+    private string email;
+}
