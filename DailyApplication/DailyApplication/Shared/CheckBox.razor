@@ -2,11 +2,11 @@
 
 @if (SubEvents[Index].isDone)
 {
-    <input type="checkbox" checked @onchange="@(() => Done(SubEvents[Index]))"/>
+    <input type="checkbox" style="width: 20px; height: 20px;" checked @onchange="@(() => Done(SubEvents[Index]))"/>
 }
 else
 {
-    <input type="checkbox" @onchange="@(() => Done(SubEvents[Index]))"/>
+    <input type="checkbox" style="width: 20px; height: 20px;" @onchange="@(() => Done(SubEvents[Index]))"/>
 }
 
 @code

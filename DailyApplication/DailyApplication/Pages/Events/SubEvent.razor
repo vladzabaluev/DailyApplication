@@ -1,0 +1,23 @@
+﻿<div class="d-flex align-items-center justify-content-between align-middle">
+    <span class="blockquote ">
+        @SubEvents[Index].Description
+    </span>
+    <CheckBox Index=Index SubEvents=SubEvents cb=DoneSub/>
+</div>
+
+@code {
+    [Parameter] 
+    public int Index { get; set; }
+
+    [Parameter]
+    public List<Sub_event> SubEvents { get; set; }
+    
+    [Parameter]
+    public EventCallback<List<Sub_event>> CallBack { get; set; }
+
+    private void DoneSub (bool isDone)
+    {
+        SubEvents[Index].isDone = isDone;
+        CallBack.InvokeAsync(SubEvents);
+    }
+}

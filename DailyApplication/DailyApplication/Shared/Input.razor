@@ -1,9 +1,11 @@
 ﻿@inject DailyApplication.Controllers.EventsController _eventController;
 
-<div>
-    <input @bind="@ChangeSub" class="alert alert-secondary" role="alert" />
-    <CheckBox Index=Index SubEvents=SubEvents cb=DoneSub/>
-    <button class="btn btn-danger" @onclick="(() => DeleteSub(SubEvents[Index]))">Удалить</button>
+<div class="d-flex align-items-center justify-content-between">
+    <div>
+        <input @bind="@ChangeSub" class="alert alert-secondary" role="alert" />
+        <CheckBox Index=Index SubEvents=SubEvents cb=DoneSub/>
+    </div>
+    <button class="btn btn-danger" @onclick="(() => DeleteSub(SubEvents[Index]))">&times;</button>
 </div>
 
 @code {

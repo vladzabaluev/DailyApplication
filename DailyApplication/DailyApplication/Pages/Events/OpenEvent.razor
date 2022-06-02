@@ -63,7 +63,7 @@
                     <Input SubEvents="@Item_subs" Index="@i" CallBack="@((value) => Item_subs = value)" />
                 </div>
             }
-            <input class="form-control" placeholder="Подсобытие" @bind=GetSubEvent />
+            <input class="form-control" placeholder="Новое подсобытие" @bind=GetSubEvent />
             @*<input class="form-control" value="@currentSubEventName" placeholder="Название" @onchange="((ChangeEventArgs __e)=> { currentSubEventName = __e.Value.ToString();
                     subEventList.Add(currentSubEventName);
                     currentSubEventName = string.Empty;
@@ -119,17 +119,16 @@ else
             @if (Item_subs != null)
             {
 
-                @foreach (Sub_event sub_Event in Item_subs)
-                {<p class="card-text">
-                        @sub_Event.Description
-                    </p>
+                @for (int index=0; index < Item_subs.Count; index++)
+                {
+                    <SubEvent SubEvents="@Item_subs" Index="@index" CallBack="@((value) => Item_subs = value)"/>
                 }
 
             }
             else
             {
                 <p class="card-text">
-                    Нет описания
+                    Нет подсобытий
                 </p>
             }
         </div>
