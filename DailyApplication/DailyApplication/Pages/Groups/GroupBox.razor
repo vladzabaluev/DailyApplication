@@ -1,0 +1,51 @@
+﻿
+
+@if (ModalOpen)
+{
+    <Modal Toggle="@(() => ModalOpen = !ModalOpen)">
+        <OpenChangeGroup Index=Index Toggle="@(() => ModalOpen = !ModalOpen)" Delete="Delete"/>
+    </Modal>
+}
+
+@if (InviteModal)
+{
+    <Modal Toggle="@(() => InviteModal = !InviteModal)">
+        <SendInvite Toggle="@(() => InviteModal = !InviteModal)" />
+    </Modal>
+}
+
+<div class="alert @groupClass" role="alert" 
+    @onclick="@(() => ModalOpen = !ModalOpen)" 
+    @onmouseover="@(() => onHover = !onHover)"
+    @onmouseout="@(() => onHover = !onHover)">
+    <h4 class="alert-heading">@groups[Index].Name</h4>
+    <hr />
+    <p>@groups[Index].Description</p>
+    <div class="d-flex justify-content-between">
+        <div>
+            <button class="btn btn-info" @onclick:stopPropagation @onclick="(() => InviteModal = !InviteModal)">Пригласить пользователя</button>
+            <button class="btn btn-danger" @onclick:stopPropagation>Выйти из группы</button>
+        </div>
+        <div>
+            <button class="btn btn-outline-primary" @onclick:stopPropagation>Изменить группу</button>
+            <button class="btn btn-outline-danger " @onclick:stopPropagation @onclick="(()=>Delete.InvokeAsync(groups[Index]))">Удалить группу</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    protected List<Group> groups { get; set; }
+
+    [Parameter]
+    public int Index { get; set; }
+
+    [Parameter]
+    public EventCallback<Group> Delete { get; set; }
+
+    private bool onHover = false;
+    private string groupClass => onHover ? "alert-dark" : "alert-secondary";
+
+    private bool ModalOpen = false;
+    private bool InviteModal = false;
+}
