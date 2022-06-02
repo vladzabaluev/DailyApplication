@@ -29,10 +29,21 @@ namespace DailyApplication.Controllers
             User currentUser = _userManager.GetUserAsync(User).Result; //найду текущего пользователя
 
             List<UserGroup> UserGroups = _context.UserGroup.Where
-                (findGroup => findGroup.User == currentUser).ToList();//найду все ЮзерГруппы, связанные с нашим юзером
+                (findGroup => findGroup.User == currentUser /*&& findGroup.UserIsInGroup == true*/).ToList();
+            //найду все ЮзерГруппы, связанные с нашим юзером
+
+            #region Magic
+
+            foreach (UserGroup userGroup in UserGroups)
+            {
+                _context.Group.FirstOrDefault(foundGroup => foundGroup.Id == userGroup.Id);
+            }
+
+            #endregion Magic
+
             foreach (UserGroup group in UserGroups) //благодаря юзергруппам найду все группы пользователя
             {
-                Groups.Add(_context.Group.FirstOrDefaultAsync(foundGroup => foundGroup == group.Group).Result);
+                Groups.Add(_context.Group.FirstOrDefault(foundGroup => foundGroup == group.Group));
             }
             return Groups;
         }
