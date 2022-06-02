@@ -1,16 +1,17 @@
 ﻿@using System.Security.Claims
 @inject DailyApplication.Controllers.GroupsController _groupsController
 
-@if(OpenInvite)
+@if (OpenInvite)
 {
-    <Modal Toggle="(() => OpenInvite = !OpenInvite)" >
-        <OpenInvite Toggle="(() => OpenInvite = !OpenInvite)" Group=OpenGroup Accept=Accept Deny=Deny/>
+    <Modal Toggle="(() => OpenInvite = !OpenInvite)">
+        <OpenInvite Toggle="(() => OpenInvite = !OpenInvite)" Group=OpenGroup Accept=Accept Deny=Deny />
     </Modal>
 }
 
 <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
         <div class="container px-0" style="max-width:80%;">
+
             <NavLink class="navbar-brand" href="" Match="NavLinkMatch.All">
                 DailyApplication
             </NavLink>
@@ -45,7 +46,7 @@
                                     @invites.Count
                                 </button>
                                 <div class="dropdown-menu @showDropDown" aria-labelledby="dropdownMenuButton">
-                                    @if(invites.Count == 0)
+                                    @if (invites.Count == 0)
                                     {
                                         <div class="dropdown-item" @onclick="(()=>show = !show)">
                                             Нет приглашений
@@ -80,16 +81,16 @@
 
     [CascadingParameter(Name = "invites")]
     public List<Group> invites { get; set; }
-    
+
     [CascadingParameter(Name = "groups")]
     public List<Group> groups { get; set; }
 
     private bool show = false;
-    #nullable enable
+#nullable enable
     private string? showDropDown => show ? "show" : null;
     private bool collapseNavMenu = true;
 
-    #nullable enable
+#nullable enable
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
     private void ToggleNavMenu()
