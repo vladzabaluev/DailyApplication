@@ -1,7 +1,8 @@
 ﻿@inject DailyApplication.Controllers.EventsController _eventsController
 
-<div class="container rounded border border-dark p-3" style="height:11vh;">
-    @Date
+<div class="alert @alertStyle" style="height:11vh; border:solid 1px">
+@*<div class="container rounded border border-dark px-3 pt-2" style="height:11vh;">*@
+    @Date.ToString("m")
     @foreach (Event item in Events)
     {
         @if (item.DeadlineTime.ToString("MM/dd/yyyy") == Date.ToString("MM/dd/yyyy"))
@@ -14,16 +15,21 @@
 @code {
     [Parameter]
     public DateTime Date { get; set; }
-    
+
+    [Parameter]
+    public int Month { get; set; }
+
     [Parameter]
     public List<Event> Events { get; set; }
-    
+
     [Parameter]
     public int WeekDay { get; set; }
 
     [Parameter]
     public EventCallback<DateTime> OpenCreateBox { get; set; }
 
+    private string alertStyle => Date.Month == Month ? "alert-secondary" : "alert-light";
+    
     #region Удаление события
     private async void DeleteEvent(Event deletedEvent)
     {
