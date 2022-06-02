@@ -8,6 +8,8 @@
 
         public Group Group { get; set; }
 
+        public bool UserIsInGroup { get; set; }
+
         public UserGroup()
         {
         }

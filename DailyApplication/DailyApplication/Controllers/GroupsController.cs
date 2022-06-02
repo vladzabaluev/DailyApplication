@@ -30,7 +30,7 @@ namespace DailyApplication.Controllers
             List<Group> Groups = new List<Group>(); //сюда запишу все группы текущего пользователя
             User currentUser = _userManager.GetUserAsync(User).Result; //найду текущего пользователя
             List<UserGroup> UserGroups = _context.UserGroup.Where
-                (findGroup => findGroup.User == currentUser).ToList(); //найду все ЮзерГруппы, связанные с нашим юзером
+                (findGroup => findGroup.User == currentUser && findGroup.UserIsInGroup == true).ToList(); //найду все ЮзерГруппы, связанные с нашим юзером
             foreach (UserGroup group in UserGroups) //благодаря юзергруппам найду все группы пользователя
             {
                 Groups.Add(_context.Group.FirstOrDefaultAsync(foundGroup => foundGroup.Id == group.Id).Result);
@@ -40,25 +40,6 @@ namespace DailyApplication.Controllers
 
         #endregion Все группы пользователя
 
-        //// GET: Groups/Details/5
-        //public async Task<IActionResult> Details(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var @group = await _context.Group
-        //        .FirstOrDefaultAsync(m => m.Id == id);
-        //    if (@group == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(@group);
-        //}
-
-        // GET: Groups/Delete/5
         public async Task<IActionResult> DeleteGroup(int? id, EventsController eventsController)
         {
             if (id == null)
@@ -82,22 +63,7 @@ namespace DailyApplication.Controllers
             //Удалить все юзер группы
 
             List<UserGroup> removableUserGroups = await _context.UserGroup.Where(remGE => remGE.Group == removableGroup).ToListAsync();
-            //List<User> users = new List<User>();
-            //users.AddRange(await _context.User.Where(us => us.UserGroup != null).ToListAsync());//= ;
-            //foreach (User user in users)
-            //{
-            //    foreach (UserGroup userGroup in removableUserGroups)
-            //    {
-            //        foreach (UserGroup _userGrooups in user.UserGroup)
-            //        {
-            //            if (_userGrooups == userGroup)
-            //            {
-            //                user.UserGroup.Remove(_userGrooups);
-            //            }
-            //        }
-            //        _context.UserGroup.Remove(userGroup);
-            //    }
-            //}
+
             foreach (UserGroup userGroup in removableUserGroups)
             {
                 _context.UserGroup.Remove(userGroup);
@@ -122,6 +88,7 @@ namespace DailyApplication.Controllers
                 UserGroup newUserGroup = new UserGroup();
                 newUserGroup.User = _userManager.GetUserAsync(User).Result;
                 newUserGroup.Group = group;
+                newUserGroup.UserIsInGroup = true;
                 _context.Add(@group);
                 _context.Add(newUserGroup);
                 await _context.SaveChangesAsync();
@@ -183,35 +150,6 @@ namespace DailyApplication.Controllers
         //    return View(@group);
         //}
 
-        //// GET: Groups/Delete/5
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var @group = await _context.Group
-        //        .FirstOrDefaultAsync(m => m.Id == id);
-        //    if (@group == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(@group);
-        //}
-
-        //// POST: Groups/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    var @group = await _context.Group.FindAsync(id);
-        //    _context.Group.Remove(@group);
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
-
         public async Task<bool> UserExists(string email)
         {
             DailyApplication.Models.User user = await _context.User.Where(requiredUser => requiredUser.Email == email).FirstOrDefaultAsync();
@@ -225,8 +163,48 @@ namespace DailyApplication.Controllers
             }
         }
 
-        public async Task SendNotification(User invitedUser)
+        public async Task InviteUser(string email, Group group)
         {
+            DailyApplication.Models.User invitedUSer = await _context.User.Where(requiredUser => requiredUser.Email == email).FirstOrDefaultAsync();
+            if (invitedUSer != null)
+            {
+                UserGroup invUserGroup = new UserGroup();
+                invUserGroup.Group = group;
+                invUserGroup.User = invitedUSer;
+                invUserGroup.UserIsInGroup = false;
+                _context.UserGroup.Add(invUserGroup);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task UserAgree(ClaimsPrincipal user, Group group)
+        {
+            UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(usGr => usGr.Group == group
+                     && usGr.User == _userManager.GetUserAsync(user).Result);
+            if (userGroup != null)
+            {
+                userGroup.UserIsInGroup = true;
+                _context.UserGroup.Update(userGroup);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task UserDisagree(ClaimsPrincipal user, Group group)
+        {
+            UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(usGr => usGr.Group == group
+                    && usGr.User == _userManager.GetUserAsync(user).Result);
+            if (userGroup != null)
+            {
+                _context.UserGroup.Remove(userGroup);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<UserGroup>> GetAllInvites(ClaimsPrincipal user)
+        {
+            List<UserGroup> groupWasUserInvited = await _context.UserGroup.Where(usGr =>
+                   usGr.User == _userManager.GetUserAsync(user).Result && usGr.UserIsInGroup == false).ToListAsync();
+            return groupWasUserInvited;
         }
 
         private bool GroupExists(int id)

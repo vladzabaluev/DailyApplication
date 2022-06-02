@@ -74,8 +74,8 @@ namespace DailyApplication.Controllers
         [ValidateAntiForgeryToken]
         public List<Event> GetUserEvents(ClaimsPrincipal user)
         {
-            List<Event> events = _context.Event.Where(ev => ev.User == _userManager.GetUserAsync(user).Result).ToList();
-            SortByTime(events);
+            List<Event> events = _context.Event.Where(ev => ev.User == _userManager.GetUserAsync(user).Result).
+                OrderBy(ev => ev.DeadlineTime).ToList();
             return events;
         }
 
@@ -91,9 +91,8 @@ namespace DailyApplication.Controllers
             //Найти все группы пользователя
             foreach (Group group in UserGroups)
             {
-                events.AddRange(_context.Event.Where(GroupEvent => GroupEvent.Group == group));
+                events.AddRange(_context.Event.Where(GroupEvent => GroupEvent.Group == group).OrderBy(ev => ev.DeadlineTime));
             }
-            SortByTime(events);
             return events;
             //найти все их ивенты и вернуть их отсортировав по времени
         }
