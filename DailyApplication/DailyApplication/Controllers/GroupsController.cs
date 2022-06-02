@@ -36,7 +36,7 @@ namespace DailyApplication.Controllers
             foreach (UserGroup ug in UserGroups) //благодаря юзергруппам найду все группы пользователя
             {
                 Group gr = new();
-                
+
                 Groups.Add(_context.Group.FirstOrDefault(foundGroup => foundGroup.Id == ug.Group.Id));
             }
             return Groups;
@@ -80,9 +80,6 @@ namespace DailyApplication.Controllers
 
         #region Создание группы
 
-        // POST: Groups/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<Group> Create([Bind("Id,Name,Description")] Group @group, ClaimsPrincipal User)
@@ -150,7 +147,7 @@ namespace DailyApplication.Controllers
             if (invitedUSer != null)
             {
                 UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(ug => ug.User == invitedUSer && ug.Group == group);
-                if (userGroup != null && userGroup.UserIsInGroup == false)
+                if (userGroup == null)
                 {
                     UserGroup invUserGroup = new UserGroup();
                     invUserGroup.Group = group;
@@ -185,7 +182,7 @@ namespace DailyApplication.Controllers
             }
         }
 
-        public async Task Exit(ClaimsPrincipal user, Group group)
+        public async Task Exit(ClaimsPrincipal user, Group group, EventsController eventsController)
         {
             UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(usGr => usGr.Group == group
                     && usGr.User == _userManager.GetUserAsync(user).Result);
@@ -193,6 +190,10 @@ namespace DailyApplication.Controllers
             {
                 _context.UserGroup.Remove(userGroup);
                 await _context.SaveChangesAsync();
+            }
+            if (GetAllUsersInGroup(group).Result.Count == 0)
+            {
+                await DeleteGroup(group.Id, eventsController);
             }
         }
 
