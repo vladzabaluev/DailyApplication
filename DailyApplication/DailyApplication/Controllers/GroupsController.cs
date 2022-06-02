@@ -28,10 +28,10 @@ namespace DailyApplication.Controllers
             List<Group> Groups = new List<Group>(); //сюда запишу все группы текущего пользователя
             User currentUser = _userManager.GetUserAsync(User).Result; //найду текущего пользователя
             List<UserGroup> UserGroups = _context.UserGroup.Where
-                (findGroup => findGroup.User == currentUser && findGroup.UserIsInGroup == true).ToList(); //найду все ЮзерГруппы, связанные с нашим юзером
+                (findGroup => findGroup.User == currentUser && findGroup.UserIsInGroup == true).ToList();//найду все ЮзерГруппы, связанные с нашим юзером
             foreach (UserGroup group in UserGroups) //благодаря юзергруппам найду все группы пользователя
             {
-                Groups.Add(_context.Group.FirstOrDefaultAsync(foundGroup => foundGroup.Id == group.Id).Result);
+                Groups.Add(_context.Group.FirstOrDefaultAsync(foundGroup => foundGroup == group.Group).Result);
             }
             return Groups;
         }
@@ -197,7 +197,7 @@ namespace DailyApplication.Controllers
             List<Group> groupWasUserInvited = new List<Group>();
             foreach (UserGroup userGroup in userGroupWasUserInvited)
             {
-                groupWasUserInvited.Add(await _context.Group.FirstOrDefaultAsync(gr => gr.Id == userGroup.Group.Id));
+                groupWasUserInvited.Add(await _context.Group.FirstOrDefaultAsync(gr => gr == userGroup.Group));
             }
             return groupWasUserInvited;
         }
