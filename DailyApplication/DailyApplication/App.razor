@@ -31,10 +31,5 @@
         ClaimsPrincipal currentUser = currentAuth.User;
 
         groups = _groupsController.GetUserGroups(currentUser);
-
-        @foreach (var item in groups)
-        {
-            Console.WriteLine(item.Name);
-        }
     }
 }

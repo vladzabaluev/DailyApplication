@@ -1,0 +1,34 @@
+﻿@inject DailyApplication.Controllers.EventsController _eventsController
+
+<div class="container rounded border border-dark p-3" style="height:11vh;">
+    @Date
+    @foreach (Event item in Events)
+    {
+        @if (item.DeadlineTime.ToString("MM/dd/yyyy") == Date.ToString("MM/dd/yyyy"))
+        {
+            <EventBox Item="@item" DeleteEvent="@DeleteEvent" />
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public DateTime Date { get; set; }
+    
+    [Parameter]
+    public List<Event> Events { get; set; }
+    
+    [Parameter]
+    public int WeekDay { get; set; }
+
+    [Parameter]
+    public EventCallback<DateTime> OpenCreateBox { get; set; }
+
+    #region Удаление события
+    private async void DeleteEvent(Event deletedEvent)
+    {
+        Events.Remove(deletedEvent);
+        await _eventsController.DeleteEvent(deletedEvent.Id);
+    }
+    #endregion
+}
