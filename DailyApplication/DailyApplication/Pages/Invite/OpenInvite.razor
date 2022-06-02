@@ -1,0 +1,54 @@
+﻿@using System.Security.Claims
+@inject DailyApplication.Controllers.GroupsController _groupsController
+
+<div class="modal-header">
+    <h5 class="modal-title">@Group.Name</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick=Toggle>
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <p>Вступить в группу @Group.Name?</p>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="(() => 
+{
+Accept(Group);
+Toggle.InvokeAsync();
+})">Вступить</button>
+    <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="(() => 
+{
+Deny(Group);
+Toggle.InvokeAsync();
+})">Отказаться</button>
+</div>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    [Parameter]
+    public EventCallback Toggle { get; set; }
+
+    [Parameter]
+    public Group Group { get; set; }
+
+    private string email;
+    ClaimsPrincipal currentUser;
+
+    protected async override Task OnInitializedAsync()
+    {
+        AuthenticationState currentAuth = await authenticationStateTask;
+        currentUser = currentAuth.User;
+    }
+
+    private async void Accept(Group group)
+    {
+        await _groupsController.UserAgree(currentUser, group);
+    }
+
+    private async void Deny(Group group)
+    {
+        await _groupsController.UserDisagree(currentUser, group);
+    }
+}

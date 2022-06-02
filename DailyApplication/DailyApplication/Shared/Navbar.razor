@@ -1,5 +1,12 @@
 ﻿@inject DailyApplication.Controllers.GroupsController _groupsController
 
+@if(OpenInvite)
+{
+    <Modal Toggle="(() => OpenInvite = !OpenInvite)" >
+        <OpenInvite Toggle="(() => OpenInvite = !OpenInvite)" Group=OpenGroup />
+    </Modal>
+}
+
 <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
         <div class="container px-0" style="max-width:80%;">
@@ -41,8 +48,9 @@
                                     @foreach (var group in invites)
                                     {
                                         <div class="dropdown-item" @onclick="(() => {
-                                                                                    show = false;
-                                                                                })">
+                                            OpenGroup = group;
+                                            OpenInvite = !OpenInvite;
+                                            })">
                                             @group.Name
                                         </div>
                                     }
@@ -58,6 +66,7 @@
 </header>
 
 @code {
+
     [CascadingParameter(Name = "invites")]
     public List<Group> invites { get; set; }
 
@@ -74,4 +83,6 @@
         collapseNavMenu = !collapseNavMenu;
     }
 
+    private bool OpenInvite = false;
+    private Group OpenGroup;
 }
