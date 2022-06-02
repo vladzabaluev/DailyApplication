@@ -1,4 +1,5 @@
-﻿
+﻿@using System.Security.Claims
+@inject DailyApplication.Controllers.GroupsController _groupsController;
 
 @if (ModalOpen)
 {
@@ -24,7 +25,7 @@
     <div class="d-flex justify-content-between">
         <div>
             <button class="btn btn-info" @onclick:stopPropagation @onclick="(() => InviteModal = !InviteModal)">Пригласить пользователя</button>
-            <button class="btn btn-danger" @onclick:stopPropagation>Выйти из группы</button>
+            <button class="btn btn-danger" @onclick:stopPropagation @onclick="(() => Exit.InvokeAsync(groups[Index]))">Выйти из группы</button>
         </div>
         <div>
             <button class="btn btn-outline-primary" @onclick:stopPropagation>Изменить группу</button>
@@ -40,6 +41,9 @@
     [Parameter]
     public int Index { get; set; }
 
+    [Parameter]
+    public EventCallback<Group> Exit { get; set; }
+    
     [Parameter]
     public EventCallback<Group> Delete { get; set; }
 
