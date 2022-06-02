@@ -28,7 +28,7 @@ else
     <div>
         @for (int index = 0; index < groups.Count; index++)
         {
-            <GroupBox Index=index Delete=DeleteGroup/>
+            <GroupBox Index=index Exit=ExitGroup Delete=DeleteGroup/>
         }
     </div>
 }
@@ -67,5 +67,13 @@ else
         groups.Remove(group);
         await _groupsController.DeleteGroup(group.Id, _eventsController);
 
+    }
+    
+    private async void ExitGroup(Group group)
+    {
+        AuthenticationState currentAuth = await authenticationStateTask;
+        ClaimsPrincipal currentUser = currentAuth.User;
+        groups.Remove(group);
+        await _groupsController.Exit(currentUser, group);
     }
 }

@@ -143,7 +143,7 @@ namespace DailyApplication.Controllers
 
         public async Task InviteUser(string email, Group group)
         {
-            DailyApplication.Models.User invitedUSer = await _context.User.Where(requiredUser => requiredUser.Email == email).FirstOrDefaultAsync();
+            User invitedUSer = await _context.User.Where(requiredUser => requiredUser.Email == email).FirstOrDefaultAsync();
             if (invitedUSer != null)
             {
                 UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(ug => ug.User == invitedUSer && ug.Group == group);
