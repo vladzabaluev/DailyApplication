@@ -143,12 +143,16 @@ namespace DailyApplication.Controllers
             DailyApplication.Models.User invitedUSer = await _context.User.Where(requiredUser => requiredUser.Email == email).FirstOrDefaultAsync();
             if (invitedUSer != null)
             {
-                UserGroup invUserGroup = new UserGroup();
-                invUserGroup.Group = group;
-                invUserGroup.User = invitedUSer;
-                invUserGroup.UserIsInGroup = false;
-                _context.UserGroup.Add(invUserGroup);
-                await _context.SaveChangesAsync();
+                UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(ug => ug.User == invitedUSer && ug.Group == group);
+                if (userGroup != null && userGroup.UserIsInGroup == false)
+                {
+                    UserGroup invUserGroup = new UserGroup();
+                    invUserGroup.Group = group;
+                    invUserGroup.User = invitedUSer;
+                    invUserGroup.UserIsInGroup = false;
+                    _context.UserGroup.Add(invUserGroup);
+                    await _context.SaveChangesAsync();
+                }
             }
         }
 
@@ -193,7 +197,7 @@ namespace DailyApplication.Controllers
             List<Group> groupWasUserInvited = new List<Group>();
             foreach (UserGroup userGroup in userGroupWasUserInvited)
             {
-                groupWasUserInvited.Add(await _context.Group.FirstOrDefaultAsync(gr => gr.Id == userGroup.Id));
+                groupWasUserInvited.Add(await _context.Group.FirstOrDefaultAsync(gr => gr.Id == userGroup.Group.Id));
             }
             return groupWasUserInvited;
         }
