@@ -30,9 +30,9 @@
     <div class="d-flex justify-content-xl-center pt-5 mt-5">
     </div>
 
-    <div class="text-center mt-lg-4">
+    <div class="text-center mt-lg-4" @onmouseover="@(() => hover = !hover)" @onmouseout="@(() => hover = !hover)">
         <NavLink class="btn btn-outline-primary btn-lg text-center align-middle" style="width:200px; height:50px" href="Identity/Account/Register">
-            Cдать курсач
+            @btnText
         </NavLink>
     </div>
 </div>
@@ -40,6 +40,8 @@
 @code{
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
+    private bool hover = false;
+    private string btnText => hover ? "Пойти в бар" : "Сдать курсач";
 
     protected async override Task OnInitializedAsync()
     {
