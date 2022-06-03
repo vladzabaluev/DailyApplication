@@ -1,7 +1,7 @@
 ﻿@inject DailyApplication.Controllers.EventsController _eventsController
 
 <div class="alert @alertStyle overflow-hidden " style="height:11vh; border:solid 1px" @onmouseover=ToggleCreateBtn @onmouseout=ToggleCreateBtn>
-@*<div class="container rounded border border-dark px-3 pt-2" style="height:11vh;">*@
+    @*<div class="container rounded border border-dark px-3 pt-2" style="height:11vh;">*@
     @Date.ToString("m")
     @foreach (Event item in Events)
     {
@@ -34,15 +34,15 @@
     public EventCallback<DateTime> OpenCreateBox { get; set; }
 
     private string alertStyle => Date.Month == Month ? "alert-light text-dark" : "alert-secondary text-secondary";
-    
+
     #region Удаление события
-    private async void DeleteEvent(Event deletedEvent)
+    private async Task DeleteEvent(Event deletedEvent)
     {
         Events.Remove(deletedEvent);
         await _eventsController.DeleteEvent(deletedEvent.Id);
     }
     #endregion
-    
+
     private bool collapseCreateHover = true;
     private void ToggleCreateBtn()
     {

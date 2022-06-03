@@ -74,10 +74,10 @@
     </div>
     <div class="modal-footer">
         <div>
-            <input type="submit" value="Изменить" class="btn btn-primary" @onclick="(() => {
-                                                                                                changeEvent(Item);
+            <input type="submit" value="Изменить" class="btn btn-primary" @onclick="(async () => {
+                                                                                                await changeEvent(Item);
                                                                                                 Change();
-                                                                                                Toggle.InvokeAsync(DateTime.Now);
+                                                                                                await Toggle.InvokeAsync(DateTime.Now);
                                                                                            })" @onclick:preventDefault />
         </div>
         <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="Change">Отмена</button>
@@ -119,9 +119,9 @@ else
             @if (Item_subs != null)
             {
 
-                @for (int index=0; index < Item_subs.Count; index++)
+                @for (int index = 0; index < Item_subs.Count; index++)
                 {
-                    <SubEvent SubEvents="@Item_subs" Index="@index" CallBack="@((value) => Item_subs = value)"/>
+                    <SubEvent SubEvents="@Item_subs" Index="@index" CallBack="@((value) => Item_subs = value)" />
                 }
 
             }
@@ -135,16 +135,18 @@ else
     </div>
     <div class="modal-footer">
         <div>
-            <input type="submit" value="Сохранить" class="btn btn-success" @onclick="(() => {
-                                                                                                changeEvent(Item);
+            <input type="submit" value="Сохранить" class="btn btn-success" @onclick="(async() => {
+                                                                                                await changeEvent(Item);
                                                                                                 Change();
-                                                                                                Toggle.InvokeAsync(DateTime.Now);
+                                                                                                await Toggle.InvokeAsync(DateTime.Now);
                                                                                            })" @onclick:preventDefault />
         </div>
         <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick=Change>Изменить</button>
         <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="(() => {Delete.InvokeAsync(Item);
             Toggle.InvokeAsync();
-        })">Удалить</button>
+        })">
+            Удалить
+        </button>
     </div>
 }
 
@@ -162,7 +164,7 @@ else
     public List<Sub_event> Item_subs { get; set; }
 
     private bool show = false;
-    #nullable enable
+#nullable enable
     private string? showDropDown => show ? "show" : null;
 
     private bool edit = false;
@@ -174,20 +176,21 @@ else
         get => currentSubEventName;
         set
         {
-            Item_subs.Add(new Sub_event() { 
-                Description = value, 
+            Item_subs.Add(new Sub_event()
+            {
+                Description = value,
                 isDone = false
             });
             currentSubEventName = "";
         }
     }
 
-    protected override void OnInitialized()
+    protected async override Task OnInitializedAsync()
     {
         if (Item.Group != null) eventGroupName = Item.Group.Name;
         else eventGroupName = "Нет команды";
         if (_eventController.GetEventSubEvents(Item.Id) != null)
-            Item_subs = _eventController.GetEventSubEvents(Item.Id);
+            Item_subs = await _eventController.GetEventSubEvents(Item.Id);
 
         if (Item_subs != null)
             foreach (Sub_event subEvent in Item_subs)
@@ -202,7 +205,7 @@ else
     [Parameter]
     public EventCallback<Event> Delete { get; set; }
 
-    private async void changeEvent(Event editedEvent)
+    private async Task changeEvent(Event editedEvent)
     {
         editedEvent.SubEvents = Item_subs;
         await _eventController.Edit(editedEvent.Id, editedEvent);

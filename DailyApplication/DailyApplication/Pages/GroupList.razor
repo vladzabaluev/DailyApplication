@@ -20,7 +20,7 @@
 
 <h1 class="display-4 my-2">Доступные группы:</h1>
 
-@if(groups.Count == 0)
+@if (groups.Count == 0)
 {
     <p>Нет доступных групп</p>
 }
@@ -29,7 +29,7 @@ else
     <div>
         @for (int index = 0; index < groups.Count; index++)
         {
-            <GroupBox Index=index Exit=ExitGroup Delete=DeleteGroup/>
+            <GroupBox Index=index Exit=ExitGroup Delete=DeleteGroup />
         }
     </div>
 }
@@ -63,14 +63,14 @@ else
         return null;
     }
 
-    private async void DeleteGroup(Group group)
+    private async Task DeleteGroup(Group group)
     {
         groups.Remove(group);
         await _groupsController.DeleteGroup(group.Id, _eventsController);
 
     }
-    
-    private async void ExitGroup(Group group)
+
+    private async Task ExitGroup(Group group)
     {
         AuthenticationState currentAuth = await authenticationStateTask;
         ClaimsPrincipal currentUser = currentAuth.User;

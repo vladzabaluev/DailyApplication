@@ -29,9 +29,12 @@ namespace DailyApplication
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContextFactory<ApplicationDbContext>(
+         options =>
+options.UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=Test"));
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(
+        Configuration.GetConnectionString("DefaultConnection")));
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true)

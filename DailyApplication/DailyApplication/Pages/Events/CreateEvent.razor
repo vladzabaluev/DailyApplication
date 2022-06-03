@@ -79,7 +79,7 @@
     private bool show = false;
     private bool error = false;
     private string textDanger => error ? "Имя не может быть пустым" : "";
-    #nullable enable
+#nullable enable
     private string? showDropDown => show ? "show" : null;
     private string currentSubEventName = "";
     private int? eventGroup;
@@ -90,8 +90,9 @@
         get => currentSubEventName;
         set
         {
-            subEventList.Add(new Sub_event() { 
-                Description = value, 
+            subEventList.Add(new Sub_event()
+            {
+                Description = value,
                 isDone = false
             });
             currentSubEventName = "";
@@ -115,14 +116,14 @@
     [Parameter]
     public EventCallback<Event> Create { get; set; }
 
-    private async void AddEvent()
+    private async Task AddEvent()
     {
         AuthenticationState currentAuth = await authenticationStateTask;
         ClaimsPrincipal currentUser = currentAuth.User;
 
         if (!string.IsNullOrWhiteSpace(eventName))
         {
-            Event newEvent = _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline, subEventList, currentGroup);
+            Event newEvent = await _eventController.CreateEvent(eventName, eventDescription, currentUser, eventDeadline, subEventList, currentGroup);
 
             await Create.InvokeAsync(newEvent);
             await Toggle.InvokeAsync(DateTime.Now);

@@ -15,14 +15,14 @@ namespace DailyApplication.Controllers
 {
     public class EventsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly UserManager<User> _userManager;
         private GroupsController _groupsController;
 
         //  private readonly IConfigureGroupSerializer configureGroupSerializer;
-        public EventsController(ApplicationDbContext context, UserManager<User> userManager/*, GroupsController groupsController*/)
+        public EventsController(IDbContextFactory<ApplicationDbContext> contextFactory, UserManager<User> userManager/*, GroupsController groupsController*/)
         {
-            _context = context;
+            _contextFactory = contextFactory;
             _userManager = userManager;
             //_groupsController = groupsController;
         }
@@ -30,21 +30,24 @@ namespace DailyApplication.Controllers
         #region Создать ивент
 
         //Созда событие(сделать асинхронным)
-        public Event CreateEvent(string Name, string Description, ClaimsPrincipal User, DateTime DeadlineTime, List<Sub_event> subEvents, Group group)
+        public async Task<Event> CreateEvent(string Name, string Description, ClaimsPrincipal User, DateTime DeadlineTime, List<Sub_event> subEvents, Group group)
         {
-            Event newEvent = new Event()
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                Name = Name,
-                Description = Description,
-                User = _userManager.GetUserAsync(User).Result,
-                DeadlineTime = DeadlineTime,
-                Group = group,
-                SubEvents = subEvents,
-                IsDone = false
-            };
-            _context.Event.Add(newEvent);
-            _context.SaveChanges();
-            return newEvent;
+                Event newEvent = new Event()
+                {
+                    Name = Name,
+                    Description = Description,
+                    User = await _userManager.GetUserAsync(User),
+                    DeadlineTime = DeadlineTime,
+                    Group = group,
+                    SubEvents = subEvents,
+                    IsDone = false
+                };
+                _context.Event.Add(newEvent);
+                await _context.SaveChangesAsync();
+                return newEvent;
+            }
         }
 
         #endregion Создать ивент
@@ -52,37 +55,49 @@ namespace DailyApplication.Controllers
         #region Вернуть ивенты
 
         //ALL EVENTS IN DB
-        public List<Event> GetAllEvents()
+        public async Task<List<Event>> GetAllEvents()
         {
-            return _context.Event.ToList();
+            using (var _context = _contextFactory.CreateDbContext())
+            {
+                return await _context.Event.ToListAsync();
+            }
         }
 
         //ONLY USER WITHOUT GROUP
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public List<Event> GetUserEvents(ClaimsPrincipal user)
+        public async Task<List<Event>> GetUserEvents(ClaimsPrincipal user)
         {
-            List<Event> events = _context.Event.Where(ev => ev.User == _userManager.GetUserAsync(user).Result).
-                OrderBy(ev => ev.DeadlineTime).ToList();
-            return events;
+            using (var _context = _contextFactory.CreateDbContext())
+            {
+                IdentityUser userTest = new IdentityUser();
+                userTest = await _userManager.GetUserAsync(user);
+                List<Event> events = await _context.Event.Where(ev => ev.User == userTest).
+                    OrderBy(ev => ev.DeadlineTime).ToListAsync();
+                return events;
+            }
         }
 
         //ONLY GROUP WITHOUT USER
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public List<Event> GetGroupEvents(ClaimsPrincipal user)
+        public async Task<List<Event>> GetGroupEvents(ClaimsPrincipal user)
         {
-            List<Group> UserGroups = _groupsController.GetUserGroups(user);
-            List<Event> events = new List<Event>();
-
-            //Найти все группы пользователя
-            foreach (Group group in UserGroups)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                events.AddRange(_context.Event.Where(GroupEvent => GroupEvent.Group == group).Include("SubEvents").OrderBy(ev => ev.DeadlineTime));
+                List<Group> UserGroups = await _groupsController.GetUserGroups(user);
+                List<Event> events = new List<Event>();
+
+                //Найти все группы пользователя
+                foreach (Group group in UserGroups)
+                {
+                    events.AddRange(_context.Event.Where(GroupEvent => GroupEvent.Group == group).Include("SubEvents").OrderBy(ev => ev.DeadlineTime));
+                }
+                return events;
             }
-            return events;
+
             //найти все их ивенты и вернуть их отсортировав по времени
         }
 
@@ -92,26 +107,33 @@ namespace DailyApplication.Controllers
         [ValidateAntiForgeryToken]
         public List<Event> GetOneGroupEvents(Group group)
         {
-            List<Event> events = new();
+            using (var _context = _contextFactory.CreateDbContext())
+            {
+                List<Event> events = new();
 
-            // Найти все ивенты группы
-            events.AddRange(_context.Event.Where(GroupEvent => GroupEvent.Group == group).Include("SubEvents").OrderBy(ev => ev.DeadlineTime));
-            return events;
+                // Найти все ивенты группы
+                events.AddRange(_context.Event.Where(GroupEvent => GroupEvent.Group == group).Include("SubEvents").OrderBy(ev => ev.DeadlineTime));
+                return events;
+            }
+
             // Вернуть их, отсортировав по времени
         }
 
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public List<Event> GetAllUserEvent(ClaimsPrincipal user, GroupsController groupsController)
+        public async Task<List<Event>> GetAllUserEvent(ClaimsPrincipal user, GroupsController groupsController)
         {
-            _groupsController = groupsController;
-            List<Event> events = new List<Event>();
-            events.AddRange(GetUserEvents(user));
-            events.AddRange(GetGroupEvents(user));
-            events = events.Distinct().ToList();
-            SortByTime(events);
-            return events;
+            using (var _context = _contextFactory.CreateDbContext())
+            {
+                _groupsController = groupsController;
+                List<Event> events = new List<Event>();
+                events.AddRange(await GetUserEvents(user));
+                events.AddRange(await GetGroupEvents(user));
+                events = events.Distinct().ToList();
+                SortByTime(events);
+                return events;
+            }
         }
 
         #region SORTIROVKA
@@ -131,11 +153,14 @@ namespace DailyApplication.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public List<Sub_event> GetEventSubEvents(int Id)
+        public async Task<List<Sub_event>> GetEventSubEvents(int Id)
         {
-            Event curEv = _context.Event.FirstOrDefault(ev => ev.Id == Id);
-            List<Sub_event> curSubEvents = _context.Sub_event.Where(curSub => curSub.Event.Id == Id).ToList();
-            return curSubEvents;
+            using (var _context = _contextFactory.CreateDbContext())
+            {
+                Event curEv = _context.Event.FirstOrDefault(ev => ev.Id == Id);
+                List<Sub_event> curSubEvents = await _context.Sub_event.Where(curSub => curSub.Event.Id == Id).ToListAsync();
+                return curSubEvents;
+            }
         }
 
         #endregion Получить подсобытия
@@ -147,13 +172,16 @@ namespace DailyApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteEventSubEvents(int Id)
         {
-            Sub_event removableSubEvent = await _context.Sub_event.FirstOrDefaultAsync(remSubEv => remSubEv.Id == Id);
-            if (removableSubEvent == null)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                return NotFound();
+                Sub_event removableSubEvent = await _context.Sub_event.FirstOrDefaultAsync(remSubEv => remSubEv.Id == Id);
+                if (removableSubEvent == null)
+                {
+                    return NotFound();
+                }
+                _context.Sub_event.Remove(removableSubEvent);
+                return new RedirectToPageResult(nameof(GetUserEvents));
             }
-            _context.Sub_event.Remove(removableSubEvent);
-            return new RedirectToPageResult(nameof(GetUserEvents));
         }
 
         #endregion Удалить подсобытие
@@ -165,26 +193,29 @@ namespace DailyApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteEvent(int? id)
         {
-            if (id == null)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                return NotFound();
-            }
-            Event removableEvent = await _context.Event.FirstOrDefaultAsync(curEv => curEv.Id == id);
-            if (removableEvent == null)
-            {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
+                Event removableEvent = await _context.Event.FirstOrDefaultAsync(curEv => curEv.Id == id);
+                if (removableEvent == null)
+                {
+                    return NotFound();
+                }
 
-            List<Sub_event> removableSubEvents = GetEventSubEvents(removableEvent.Id);
-            foreach (Sub_event sub_Event in removableSubEvents)
-            {
-                Sub_event currentRemSubEvent = _context.Sub_event.FirstOrDefault(remSubEv => remSubEv.Id == sub_Event.Id);
-                _context.Sub_event.Remove(currentRemSubEvent);
-            }
-            _context.Event.Remove(removableEvent);
+                List<Sub_event> removableSubEvents = await GetEventSubEvents(removableEvent.Id);
+                foreach (Sub_event sub_Event in removableSubEvents)
+                {
+                    Sub_event currentRemSubEvent = _context.Sub_event.FirstOrDefault(remSubEv => remSubEv.Id == sub_Event.Id);
+                    _context.Sub_event.Remove(currentRemSubEvent);
+                }
+                _context.Event.Remove(removableEvent);
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(GetUserEvents));
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(GetUserEvents));
+            }
         }
 
         #endregion Удалить события
@@ -196,31 +227,34 @@ namespace DailyApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,DeadlineTime")] Event @event)
         {
-            if (id != @event.Id)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                return NotFound();
-            }
+                if (id != @event.Id)
+                {
+                    return NotFound();
+                }
 
-            if (ModelState.IsValid)
-            {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Update(@event);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EventExists(@event.Id))
+                    try
                     {
-                        return NotFound();
+                        _context.Update(@event);
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!EventExists(@event.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
                 }
+                return RedirectToAction(nameof(GetUserEvents));
             }
-            return RedirectToAction(nameof(GetUserEvents));
         }
 
         #endregion Изменить события
@@ -232,31 +266,34 @@ namespace DailyApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubEdit(int id, [Bind("Id,Name,Description")] Sub_event subEvent)
         {
-            if (id != subEvent.Id)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                return NotFound();
-            }
+                if (id != subEvent.Id)
+                {
+                    return NotFound();
+                }
 
-            if (ModelState.IsValid)
-            {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Update(subEvent);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EventExists(subEvent.Id))
+                    try
                     {
-                        return NotFound();
+                        _context.Update(subEvent);
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!EventExists(subEvent.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
                 }
+                return RedirectToAction(nameof(GetUserEvents));
             }
-            return RedirectToAction(nameof(GetUserEvents));
         }
 
         #endregion Изменить подсобытия
@@ -268,19 +305,22 @@ namespace DailyApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DoneEvent(int? id)
         {
-            if (id == null)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                return NotFound();
+                if (id == null)
+                {
+                    return NotFound();
+                }
+                var processEvent = await _context.Event.FirstOrDefaultAsync(procEv => procEv.Id == id);
+                if (processEvent == null)
+                {
+                    return NotFound();
+                }
+                processEvent.IsDone = true;
+                _context.Update(processEvent);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(GetUserEvents));
             }
-            var processEvent = await _context.Event.FirstOrDefaultAsync(procEv => procEv.Id == id);
-            if (processEvent == null)
-            {
-                return NotFound();
-            }
-            processEvent.IsDone = true;
-            _context.Update(processEvent);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(GetUserEvents));
         }
 
         #endregion Выполнить событие
@@ -292,26 +332,32 @@ namespace DailyApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DoneSubEvent(int? id)
         {
-            if (id == null)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                return NotFound();
+                if (id == null)
+                {
+                    return NotFound();
+                }
+                var processSUBEvent = await _context.Sub_event.FirstOrDefaultAsync(procEv => procEv.Id == id);
+                if (processSUBEvent == null)
+                {
+                    return NotFound();
+                }
+                processSUBEvent.isDone = !processSUBEvent.isDone;
+                _context.Update(processSUBEvent);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(GetUserEvents));
             }
-            var processSUBEvent = await _context.Sub_event.FirstOrDefaultAsync(procEv => procEv.Id == id);
-            if (processSUBEvent == null)
-            {
-                return NotFound();
-            }
-            processSUBEvent.isDone = !processSUBEvent.isDone;
-            _context.Update(processSUBEvent);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(GetUserEvents));
         }
 
         #endregion Выполнить подсобытие
 
         private bool EventExists(int id)
         {
-            return _context.Event.Any(e => e.Id == id);
+            using (var _context = _contextFactory.CreateDbContext())
+            {
+                return _context.Event.Any(e => e.Id == id);
+            }
         }
     }
 }

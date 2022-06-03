@@ -3,7 +3,7 @@
 <div class="d-flex align-items-center justify-content-between">
     <div>
         <input @bind="@ChangeSub" class="alert alert-secondary" role="alert" />
-        <CheckBox Index=Index SubEvents=SubEvents cb=DoneSub/>
+        <CheckBox Index=Index SubEvents=SubEvents cb=DoneSub />
     </div>
     <button class="btn btn-danger" @onclick="(() => DeleteSub(SubEvents[Index]))">&times;</button>
 </div>
@@ -17,7 +17,6 @@
 
     [Parameter]
     public EventCallback<List<Sub_event>> CallBack { get; set; }
-
 
     private string ChangeSub
     {
@@ -35,7 +34,7 @@
         CallBack.InvokeAsync(SubEvents);
     }
 
-    private async void DeleteSub (Sub_event subEvent)
+    private async Task DeleteSub (Sub_event subEvent)
     {
         await _eventController.DeleteEventSubEvents(subEvent.Id);
         SubEvents.Remove(subEvent);

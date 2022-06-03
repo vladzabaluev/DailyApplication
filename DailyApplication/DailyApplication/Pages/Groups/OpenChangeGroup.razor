@@ -1,14 +1,14 @@
 ﻿@inject DailyApplication.Controllers.GroupsController _groupsController;
 
-@if(Edit)
+@if (Edit)
 {
     <form>
         <div class="modal-header">
-                <div class="form-group">
-                    <label class="control-label">Название</label>
-                    <input class="form-control" placeholder="Название" @bind=groups[Index].Name />
-                    <span class="text-danger"></span>
-                </div>
+            <div class="form-group">
+                <label class="control-label">Название</label>
+                <input class="form-control" placeholder="Название" @bind=groups[Index].Name />
+                <span class="text-danger"></span>
+            </div>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick=Toggle>
                 <span aria-hidden="true">&times;</span>
             </button>
@@ -20,31 +20,31 @@
                 <span class="text-danger"></span>
             </div>
             @*<p class="font-weight-bold">Описание:</p>
-            <div class="my-1">
-                @if (groups[Index].Description != null && groups[Index].Description != "")
-                {
-                    <p class="card-text">
-                        @groups[Index].Description
-                    </p>
-                }
-                else
-                {
-                    <p class="card-text">
-                        Нет описания
-                    </p>
-                }
-            </div>*@
+                <div class="my-1">
+                    @if (groups[Index].Description != null && groups[Index].Description != "")
+                    {
+                        <p class="card-text">
+                            @groups[Index].Description
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="card-text">
+                            Нет описания
+                        </p>
+                    }
+                </div>*@
             <div class="form-group">
                 <p class="font-weight-bold">Пользователи:</p>
             </div>
         </div>
         <div class="modal-footer">
             <div>
-                <input type="submit" value="Изменить" class="btn btn-primary" @onclick="(() => {
-                                                                                                    changeGroup(groups[Index]);
-                                                                                                    Edit = !Edit;
-                                                                                                    Toggle.InvokeAsync(DateTime.Now);
-                                                                                               })" @onclick:preventDefault />
+                <input type="submit" value="Изменить" class="btn btn-primary" @onclick="(async() => {
+                                                                                            await ChangeGroup(groups[Index]);
+                                                                                            Edit = !Edit;
+                                                                                            await Toggle.InvokeAsync(DateTime.Now);
+                                                                                        })" @onclick:preventDefault />
             </div>
             <button type="button" class="btn btn-secondary" data-dismiss="modal" @onclick="(() => Edit = !Edit)">Отмена</button>
         </div>
@@ -76,10 +76,10 @@ else
         </div>
         <div class="form-group">
             <p class="font-weight-bold">Пользователи:</p>
-                @foreach(var user in Users)
-                {
-                    <p>@user</p>
-                }
+            @foreach (var user in Users)
+            {
+                <p>@user</p>
+            }
         </div>
     </div>
     <div class="modal-footer">
@@ -87,7 +87,9 @@ else
         <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="(() => {
             Delete.InvokeAsync(groups[Index]);
             Toggle.InvokeAsync();
-            })">Удалить</button>
+            })">
+            Удалить
+        </button>
     </div>
 }
 
@@ -113,7 +115,7 @@ else
         Users = await _groupsController.GetAllUsersInGroup(groups[Index]);
     }
 
-    private async void changeGroup(Group group)
+    private async Task ChangeGroup(Group group)
     {
         await _groupsController.EditGroup(group.Id, group);
     }

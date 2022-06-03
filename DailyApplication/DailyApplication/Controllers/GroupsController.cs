@@ -13,69 +13,75 @@ namespace DailyApplication.Controllers
 {
     public class GroupsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
         private readonly UserManager<User> _userManager;
 
-        public GroupsController(ApplicationDbContext context, UserManager<User> userManager)
+        public GroupsController(IDbContextFactory<ApplicationDbContext> contextFactory, UserManager<User> userManager)
         {
-            _context = context;
+            _contextFactory = contextFactory;
             _userManager = userManager;
         }
 
         #region Все группы пользователя
 
-        public List<Group> GetUserGroups(ClaimsPrincipal User)
+        public async Task<List<Group>> GetUserGroups(ClaimsPrincipal User)
         {
-            List<Group> Groups = new List<Group>(); //сюда запишу все группы текущего пользователя
-            User currentUser = _userManager.GetUserAsync(User).Result; //найду текущего пользователя
-
-            List<UserGroup> UserGroups = _context.UserGroup.Where
-                (findGroup => findGroup.User == currentUser && findGroup.UserIsInGroup == true).Include("Group").ToList();
-            //найду все ЮзерГруппы, связанные с нашим юзером
-
-            foreach (UserGroup ug in UserGroups) //благодаря юзергруппам найду все группы пользователя
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                Group gr = new();
+                List<Group> Groups = new List<Group>(); //сюда запишу все группы текущего пользователя
+                User currentUser = await _userManager.GetUserAsync(User); //найду текущего пользователя
 
-                Groups.Add(_context.Group.FirstOrDefault(foundGroup => foundGroup.Id == ug.Group.Id));
+                List<UserGroup> UserGroups = await _context.UserGroup.Where
+                    (findGroup => findGroup.User == currentUser && findGroup.UserIsInGroup == true).Include("Group").ToListAsync();
+                //найду все ЮзерГруппы, связанные с нашим юзером
+
+                foreach (UserGroup ug in UserGroups) //благодаря юзергруппам найду все группы пользователя
+                {
+                    Group gr = new();
+
+                    Groups.Add(_context.Group.FirstOrDefault(foundGroup => foundGroup.Id == ug.Group.Id));
+                }
+                return Groups;
             }
-            return Groups;
         }
 
         #endregion Все группы пользователя
 
         public async Task<IActionResult> DeleteGroup(int? id, EventsController eventsController)
         {
-            if (id == null)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                return NotFound();
-            }
-            var removableGroup = await _context.Group
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (removableGroup == null)
-            {
-                return NotFound();
-            }
+                if (id == null)
+                {
+                    return NotFound();
+                }
+                var removableGroup = await _context.Group
+                    .FirstOrDefaultAsync(m => m.Id == id);
+                if (removableGroup == null)
+                {
+                    return NotFound();
+                }
 
-            //Удалить все ивенты группы
-            List<Event> removableGroupEvents = await _context.Event.Where(remGE => remGE.Group.Id == removableGroup.Id).ToListAsync();
-            foreach (Event removableEvent in removableGroupEvents)
-            {
-                await eventsController.DeleteEvent(removableEvent.Id);
-            }
-            //получать всех юзеров через юзер группы и у них удалять ссылки на юзер группы
-            //Удалить все юзер группы
+                //Удалить все ивенты группы
+                List<Event> removableGroupEvents = await _context.Event.Where(remGE => remGE.Group.Id == removableGroup.Id).ToListAsync();
+                foreach (Event removableEvent in removableGroupEvents)
+                {
+                    await eventsController.DeleteEvent(removableEvent.Id);
+                }
+                //получать всех юзеров через юзер группы и у них удалять ссылки на юзер группы
+                //Удалить все юзер группы
 
-            List<UserGroup> removableUserGroups = await _context.UserGroup.Where(remGE => remGE.Group == removableGroup).ToListAsync();
+                List<UserGroup> removableUserGroups = await _context.UserGroup.Where(remGE => remGE.Group == removableGroup).ToListAsync();
 
-            foreach (UserGroup userGroup in removableUserGroups)
-            {
-                _context.UserGroup.Remove(userGroup);
+                foreach (UserGroup userGroup in removableUserGroups)
+                {
+                    _context.UserGroup.Remove(userGroup);
+                }
+                //Удалить группу
+                _context.Group.Remove(removableGroup);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(EventsController.GetAllUserEvent));
             }
-            //Удалить группу
-            _context.Group.Remove(removableGroup);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(EventsController.GetAllUserEvent));
         }
 
         #region Создание группы
@@ -84,145 +90,175 @@ namespace DailyApplication.Controllers
         [ValidateAntiForgeryToken]
         public async Task<Group> Create([Bind("Id,Name,Description")] Group @group, ClaimsPrincipal User)
         {
-            if (ModelState.IsValid)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                UserGroup newUserGroup = new UserGroup();
-                newUserGroup.User = _userManager.GetUserAsync(User).Result;
-                newUserGroup.Group = group;
-                newUserGroup.UserIsInGroup = true;
-                _context.Add(@group);
-                _context.Add(newUserGroup);
-                await _context.SaveChangesAsync();
-                RedirectToAction(nameof(EventsController.GetUserEvents));
+                if (ModelState.IsValid)
+                {
+                    UserGroup newUserGroup = new UserGroup();
+                    newUserGroup.User = await _userManager.GetUserAsync(User);
+                    newUserGroup.Group = group;
+                    newUserGroup.UserIsInGroup = true;
+                    _context.Add(@group);
+                    _context.Add(newUserGroup);
+                    await _context.SaveChangesAsync();
+                    RedirectToAction(nameof(EventsController.GetUserEvents));
+                }
+                return group;
             }
-            return group;
         }
 
         #endregion Создание группы
 
         public async Task<IActionResult> EditGroup(int id, [Bind("Id,Name,Description")] Group group)
         {
-            if (id != @group.Id)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                return NotFound();
-            }
-            if (ModelState.IsValid)
-            {
-                try
+                if (id != @group.Id)
                 {
-                    _context.Update(@group);
-                    await _context.SaveChangesAsync();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
+                if (ModelState.IsValid)
                 {
-                    if (!GroupExists(@group.Id))
+                    try
                     {
-                        return NotFound();
+                        _context.Update(@group);
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!GroupExists(@group.Id))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
                 }
+                return RedirectToAction(nameof(GetUserGroups));
             }
-            return RedirectToAction(nameof(GetUserGroups));
         }
 
         public async Task<bool> UserExists(string email)
         {
-            DailyApplication.Models.User user = await _context.User.Where(requiredUser => requiredUser.Email == email).FirstOrDefaultAsync();
-            if (user != null)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                return true;
-            }
-            else
-            {
-                return false;
+                DailyApplication.Models.User user = await _context.User.Where(requiredUser => requiredUser.Email == email).FirstOrDefaultAsync();
+                if (user != null)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
 
         public async Task InviteUser(string email, Group group)
         {
-            User invitedUSer = await _context.User.Where(requiredUser => requiredUser.Email == email).FirstOrDefaultAsync();
-            if (invitedUSer != null)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(ug => ug.User == invitedUSer && ug.Group == group);
-                if (userGroup == null)
+                User invitedUSer = await _context.User.Where(requiredUser => requiredUser.Email == email).FirstOrDefaultAsync();
+                if (invitedUSer != null)
                 {
-                    UserGroup invUserGroup = new UserGroup();
-                    invUserGroup.Group = group;
-                    invUserGroup.User = invitedUSer;
-                    invUserGroup.UserIsInGroup = false;
-                    _context.UserGroup.Add(invUserGroup);
-                    await _context.SaveChangesAsync();
+                    UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(ug => ug.User == invitedUSer && ug.Group == group);
+                    if (userGroup == null)
+                    {
+                        UserGroup invUserGroup = new UserGroup();
+                        invUserGroup.Group = group;
+                        invUserGroup.User = invitedUSer;
+                        invUserGroup.UserIsInGroup = false;
+                        _context.UserGroup.Add(invUserGroup);
+                        await _context.SaveChangesAsync();
+                    }
                 }
             }
         }
 
         public async Task UserAgree(ClaimsPrincipal user, Group group)
         {
-            UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(usGr => usGr.Group == group
-                     && usGr.User == _userManager.GetUserAsync(user).Result);
-            if (userGroup != null)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                userGroup.UserIsInGroup = true;
-                _context.UserGroup.Update(userGroup);
-                await _context.SaveChangesAsync();
+                UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(usGr => usGr.Group == group
+         && usGr.User == _userManager.GetUserAsync(user).Result);
+                if (userGroup != null)
+                {
+                    userGroup.UserIsInGroup = true;
+                    _context.UserGroup.Update(userGroup);
+                    await _context.SaveChangesAsync();
+                }
             }
         }
 
         public async Task UserDisagree(ClaimsPrincipal user, Group group)
         {
-            UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(usGr => usGr.Group == group
-                    && usGr.User == _userManager.GetUserAsync(user).Result);
-            if (userGroup != null)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                _context.UserGroup.Remove(userGroup);
-                await _context.SaveChangesAsync();
+                UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(usGr => usGr.Group == group
+        && usGr.User == _userManager.GetUserAsync(user).Result);
+                if (userGroup != null)
+                {
+                    _context.UserGroup.Remove(userGroup);
+                    await _context.SaveChangesAsync();
+                }
             }
         }
 
         public async Task Exit(ClaimsPrincipal user, Group group, EventsController eventsController)
         {
-            UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(usGr => usGr.Group == group
-                    && usGr.User == _userManager.GetUserAsync(user).Result);
-            if (userGroup != null)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                _context.UserGroup.Remove(userGroup);
-                await _context.SaveChangesAsync();
-            }
-            if (GetAllUsersInGroup(group).Result.Count == 0)
-            {
-                await DeleteGroup(group.Id, eventsController);
+                UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(usGr => usGr.Group == group
+        && usGr.User == _userManager.GetUserAsync(user).Result);
+                if (userGroup != null)
+                {
+                    _context.UserGroup.Remove(userGroup);
+                    await _context.SaveChangesAsync();
+                }
+                if (GetAllUsersInGroup(group).Result.Count == 0)
+                {
+                    await DeleteGroup(group.Id, eventsController);
+                }
             }
         }
 
         public async Task<List<Group>> GetAllInvites(ClaimsPrincipal user)
         {
-            List<UserGroup> userGroupWasUserInvited = await _context.UserGroup.Where(usGr =>
-                   usGr.User == _userManager.GetUserAsync(user).Result && usGr.UserIsInGroup == false).Include("Group").ToListAsync();
-            List<Group> groupWasUserInvited = new List<Group>();
-            foreach (UserGroup userGroup in userGroupWasUserInvited)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                groupWasUserInvited.Add(await _context.Group.FirstOrDefaultAsync(gr => gr == userGroup.Group));
+                List<UserGroup> userGroupWasUserInvited = await _context.UserGroup.Where(usGr =>
+       usGr.User == _userManager.GetUserAsync(user).Result && usGr.UserIsInGroup == false).Include("Group").ToListAsync();
+                List<Group> groupWasUserInvited = new List<Group>();
+                foreach (UserGroup userGroup in userGroupWasUserInvited)
+                {
+                    groupWasUserInvited.Add(await _context.Group.FirstOrDefaultAsync(gr => gr == userGroup.Group));
+                }
+                return groupWasUserInvited;
             }
-            return groupWasUserInvited;
         }
 
         public async Task<List<User>> GetAllUsersInGroup(Group group)
         {
-            List<User> usersInGroup = new List<User>();
-            List<UserGroup> userGroups = await _context.UserGroup.Where(usGr => usGr.Group == group).Include("User").ToListAsync();
-            foreach (UserGroup ug in userGroups)
+            using (var _context = _contextFactory.CreateDbContext())
             {
-                usersInGroup.Add(ug.User);
+                List<User> usersInGroup = new List<User>();
+                List<UserGroup> userGroups = await _context.UserGroup.Where(usGr => usGr.Group == group).Include("User").ToListAsync();
+                foreach (UserGroup ug in userGroups)
+                {
+                    usersInGroup.Add(ug.User);
+                }
+                return usersInGroup;
             }
-            return usersInGroup;
         }
 
         private bool GroupExists(int id)
         {
-            return _context.Group.Any(e => e.Id == id);
+            using (var _context = _contextFactory.CreateDbContext())
+            {
+                return _context.Group.Any(e => e.Id == id);
+            }
         }
     }
 }

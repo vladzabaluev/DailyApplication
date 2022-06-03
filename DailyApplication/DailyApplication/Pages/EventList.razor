@@ -23,8 +23,8 @@
                     @eventGroupName
                 </button>
                 <div class="dropdown-menu @showDropDown" aria-labelledby="dropdownMenuButton">
-                    <div class="dropdown-item" @onclick="@(() => {
-                                                                events = _eventController.GetAllUserEvent(currentUser, _groupController);
+                    <div class="dropdown-item" @onclick="@(async () => {
+                                                                events = await _eventController.GetAllUserEvent(currentUser, _groupController);
                                                                 currentGroup = null;
                                                                 eventGroupName = "Команда";
                                                                 show = false;
@@ -76,10 +76,10 @@
         @for (int weekNum = 0, day = 0; weekNum < rows; weekNum++)
         {
             <div class="row mx-0" style="width:100%;">
-                @for(int weekDay = 0; weekDay < 7; weekDay++)
+                @for (int weekDay = 0; weekDay < 7; weekDay++)
                 {
                     <div class="col py-2" style="width:14.28%;">
-                        <MonthView Month=@month[15].Month Date=month[day] Events=@events WeekDay=@weekDay OpenCreateBox=@ToggleModalCreate/>
+                        <MonthView Month=@month[15].Month Date=month[day] Events=@events WeekDay=@weekDay OpenCreateBox=@ToggleModalCreate />
                     </div>
                     day++;
                 }
@@ -90,7 +90,7 @@
 @if (view == "D")
 {
     <div class="row mx-0">
-        <DayView  Events=@events Date=@day OpenCreateBox=@ToggleModalCreate />
+        <DayView Events=@events Date=@day OpenCreateBox=@ToggleModalCreate />
     </div>
 }
 
@@ -99,7 +99,7 @@
     [CascadingParameter(Name = "groups")]
     public List<Group> groups { get; set; }
     private bool show = false;
-    #nullable enable
+#nullable enable
     private string? showDropDown => show ? "show" : null;
     private string eventGroupName = "Команда";
     private Group? currentGroup;
@@ -227,7 +227,7 @@
 
         //events = _eventController.GetGroupEvents(currentUser);
         //events = _eventController.GetUserEvents(currentUser);
-        events = _eventController.GetAllUserEvent(currentUser, _groupController);
+        events =await _eventController.GetAllUserEvent(currentUser, _groupController);
     }
     #endregion
 }

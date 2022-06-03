@@ -44,7 +44,7 @@
     }
 
     #region Удаление события
-    private async void DeleteEvent(Event deletedEvent)
+    private async Task DeleteEvent(Event deletedEvent)
     {
         Events.Remove(deletedEvent);
         await _eventController.DeleteEvent(deletedEvent.Id);

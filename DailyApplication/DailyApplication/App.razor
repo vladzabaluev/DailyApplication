@@ -10,14 +10,14 @@
             <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
                 <Found Context="routeData">
                     <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
-                         <NotAuthorized>
-                             <DailyApplication.Pages.Index />
-                         </NotAuthorized>
-                     </AuthorizeRouteView>
+                        <NotAuthorized>
+                            <DailyApplication.Pages.Index />
+                        </NotAuthorized>
+                    </AuthorizeRouteView>
                 </Found>
                 <NotFound>
                     <LayoutView Layout="@typeof(MainLayout)">
-                             <DailyApplication.Pages.Index />
+                        <DailyApplication.Pages.Index />
                     </LayoutView>
                 </NotFound>
             </Router>
@@ -36,18 +36,18 @@
         AuthenticationState currentAuth = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         currentUser = currentAuth.User;
 
-        groups = _groupsController.GetUserGroups(currentUser);
+        groups = await _groupsController.GetUserGroups(currentUser);
         invites = await _groupsController.GetAllInvites(currentUser);
         Timer();
     }
-        
+
     private void Timer()
     {
         var timer = new Timer(new TimerCallback(_ =>
         {
-            InvokeAsync(async() =>
+            InvokeAsync(async () =>
             {
-                groups = _groupsController.GetUserGroups(currentUser);
+                groups = await _groupsController.GetUserGroups(currentUser);
                 invites = await _groupsController.GetAllInvites(currentUser);
                 StateHasChanged();
             });
