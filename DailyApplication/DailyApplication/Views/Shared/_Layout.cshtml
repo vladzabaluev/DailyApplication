@@ -11,7 +11,14 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container px-0" style="max-width:80%;">
-                <a class="navbar-brand" href="/">DailyApplication</a>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <a class="navbar-brand" href="/">DailyApplication</a>
+                }
+                else
+                {
+                    <a class="navbar-brand" href="/hello">DailyApplication</a>
+                }
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -21,7 +28,7 @@
                         @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" href="/events">События</a>
+                                <a class="nav-link text-dark" href="/">События</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" href="/groups">Команды</a>

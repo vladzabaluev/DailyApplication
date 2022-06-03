@@ -1,6 +1,6 @@
-﻿@inject NavigationManager NavigationManager
-
-@page "/"
+﻿@page "/hello"
+@using System.Security.Claims
+@inject NavigationManager navMan
 
 <div class="d-flex justify-content-xl-center pt-4 mt-3">
 </div>
@@ -38,15 +38,14 @@
 </div>
 
 @code{
-    [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     protected async override Task OnInitializedAsync()
     {
-        base.OnInitialized();
-        var user = (await AuthStat).User;
-        if(!user.Identity.IsAuthenticated)
-        {
-            NavigationManager.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(NavigationManager.Uri)}");
-        }
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated) navMan.NavigateTo("");
     }
 }

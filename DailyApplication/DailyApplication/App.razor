@@ -1,18 +1,23 @@
 ﻿@using System.Security.Claims
+@using System.Timers
 @inject DailyApplication.Controllers.GroupsController _groupsController
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager navMan
 
 <CascadingAuthenticationState>
     <CascadingValue Value="@groups" Name="groups">
         <CascadingValue Value="@invites" Name="invites">
             <Router AppAssembly="@typeof(Program).Assembly" PreferExactMatches="@true">
                 <Found Context="routeData">
-                    <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                    <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                         <NotAuthorized>
+                             <DailyApplication.Pages.Index />
+                         </NotAuthorized>
+                     </AuthorizeRouteView>
                 </Found>
                 <NotFound>
                     <LayoutView Layout="@typeof(MainLayout)">
-                        <h1>Error404</h1>
-                        <p>Sorry, there's nothing at this address.</p>
+                             <DailyApplication.Pages.Index />
                     </LayoutView>
                 </NotFound>
             </Router>
@@ -22,20 +27,28 @@
 
 @code
 {
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
-
     private List<Group> groups = new();
     private List<Group> invites = new();
+
+    //Timer timer = new Timer();
 
     protected async override Task OnInitializedAsync()
     {
         AuthenticationState currentAuth = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         ClaimsPrincipal currentUser = currentAuth.User;
+        
+            groups = _groupsController.GetUserGroups(currentUser);
+            invites = await _groupsController.GetAllInvites(currentUser);
+            
+            //if (currentUser == null) { navMan.NavigateTo("hello"); }
 
-        groups = _groupsController.GetUserGroups(currentUser);
-
-        invites = await _groupsController.GetAllInvites(currentUser);
+        //timer.Interval = 5000;
+        //timer.Elapsed +=async(_, _) =>
+        //{
+        //    groups = _groupsController.GetUserGroups(currentUser);
+        //    invites = await _groupsController.GetAllInvites(currentUser);
+        //StateHasChanged();
+        //}
     }
 
 }

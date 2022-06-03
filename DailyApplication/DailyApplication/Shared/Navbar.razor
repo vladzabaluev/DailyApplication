@@ -11,10 +11,18 @@
 <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
         <div class="container px-0" style="max-width:80%;">
-
-            <NavLink class="navbar-brand" href="" Match="NavLinkMatch.All">
-                DailyApplication
-            </NavLink>
+            @if(currentUser == null)
+            {
+                <NavLink class="navbar-brand" href="hello" Match="NavLinkMatch.All">
+                    DailyApplication
+                </NavLink>
+            }
+            else
+            {
+                <NavLink class="navbar-brand" href="" Match="NavLinkMatch.All">
+                    DailyApplication
+                </NavLink>
+            }
             <button class="navbar-toggler" @onclick="ToggleNavMenu">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -22,7 +30,7 @@
                 <ul class="navbar-nav flex-grow-1">
                     <AuthorizeView>
                         <li class="nav-item">
-                            <NavLink class="nav-link text-dark" href="events">
+                            <NavLink class="nav-link text-dark" href="">
                                 События
                             </NavLink>
                         </li>

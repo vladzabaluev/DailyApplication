@@ -1,4 +1,5 @@
 ﻿@page "/groups"
+@attribute [Authorize]
 @using System.Security.Claims
 @inject DailyApplication.Controllers.GroupsController _groupsController;
 @inject DailyApplication.Controllers.EventsController _eventsController;
