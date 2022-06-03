@@ -80,10 +80,24 @@ namespace DailyApplication.Controllers
             //Найти все группы пользователя
             foreach (Group group in UserGroups)
             {
-                events.AddRange(_context.Event.Where(GroupEvent => GroupEvent.Group == group).OrderBy(ev => ev.DeadlineTime));
+                events.AddRange(_context.Event.Where(GroupEvent => GroupEvent.Group == group).Include("SubEvents").OrderBy(ev => ev.DeadlineTime));
             }
             return events;
             //найти все их ивенты и вернуть их отсортировав по времени
+        }
+
+        // ONLY ONE GROUP WITHOUT USER
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public List<Event> GetOneGroupEvents(Group group)
+        {
+            List<Event> events = new();
+
+            // Найти все ивенты группы
+            events.AddRange(_context.Event.Where(GroupEvent => GroupEvent.Group == group).Include("SubEvents").OrderBy(ev => ev.DeadlineTime));
+            return events;
+            // Вернуть их, отсортировав по времени
         }
 
         [Authorize]

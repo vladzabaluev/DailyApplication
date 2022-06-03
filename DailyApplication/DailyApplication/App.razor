@@ -1,5 +1,5 @@
 ﻿@using System.Security.Claims
-@using System.Timers
+@using System.Threading
 @inject DailyApplication.Controllers.GroupsController _groupsController
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager navMan
@@ -30,25 +30,27 @@
     private List<Group> groups = new();
     private List<Group> invites = new();
 
-    //Timer timer = new Timer();
-
+    ClaimsPrincipal currentUser;
     protected async override Task OnInitializedAsync()
     {
         AuthenticationState currentAuth = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        ClaimsPrincipal currentUser = currentAuth.User;
-        
-            groups = _groupsController.GetUserGroups(currentUser);
-            invites = await _groupsController.GetAllInvites(currentUser);
-            
-            //if (currentUser == null) { navMan.NavigateTo("hello"); }
+        currentUser = currentAuth.User;
 
-        //timer.Interval = 5000;
-        //timer.Elapsed +=async(_, _) =>
-        //{
-        //    groups = _groupsController.GetUserGroups(currentUser);
-        //    invites = await _groupsController.GetAllInvites(currentUser);
-        //StateHasChanged();
-        //}
+        groups = _groupsController.GetUserGroups(currentUser);
+        invites = await _groupsController.GetAllInvites(currentUser);
+        Timer();
     }
-
+        
+    private void Timer()
+    {
+        var timer = new Timer(new TimerCallback(_ =>
+        {
+            InvokeAsync(async() =>
+            {
+                groups = _groupsController.GetUserGroups(currentUser);
+                invites = await _groupsController.GetAllInvites(currentUser);
+                StateHasChanged();
+            });
+        }), null, 5000, 5000);
+    }
 }

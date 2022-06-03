@@ -17,6 +17,34 @@
 <div class="d-flex justify-content-between">
     <button class="btn btn-outline-dark mt-1 mb-3" @onclick="@(() => ToggleModalCreate(DateTime.Now))">Создать</button>
     <div>
+        <div class="form-group d-inline-block">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" @onclick="(()=>show = !show)">
+                    @eventGroupName
+                </button>
+                <div class="dropdown-menu @showDropDown" aria-labelledby="dropdownMenuButton">
+                    <div class="dropdown-item" @onclick="@(() => {
+                                                                events = _eventController.GetAllUserEvent(currentUser, _groupController);
+                                                                currentGroup = null;
+                                                                eventGroupName = "Команда";
+                                                                show = false;
+                                                            })">
+                        Нет команды
+                    </div>
+                    @foreach (var group in groups)
+                    {
+                        <div class="dropdown-item" @onclick="(() => {
+                                                                events = _eventController.GetOneGroupEvents(group);
+                                                                currentGroup = group;
+                                                                eventGroupName = group.Name;
+                                                                show = false;
+                                                                })">
+                            @group.Name
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
         @if (view == "W")
         {
             <DateSelector Date="@WeekDate" Increment="@InWeek" Decrement="@DeWeek" />
@@ -68,6 +96,13 @@
 
 @code
 {
+    [CascadingParameter(Name = "groups")]
+    public List<Group> groups { get; set; }
+    private bool show = false;
+    #nullable enable
+    private string? showDropDown => show ? "show" : null;
+    private string eventGroupName = "Команда";
+    private Group? currentGroup;
     private string view = "W";
     private void setView(string newView)
     {
@@ -180,15 +215,15 @@
     #endregion
 
     #region Получение событий
-    private List<Event> events;
+    private List<Event> events = new();
 
     [CascadingParameter]
     private Task<AuthenticationState> authenticationStateTask { get; set; }
-
+    ClaimsPrincipal? currentUser;
     protected async override Task OnInitializedAsync()
     {
         AuthenticationState currentAuth = await authenticationStateTask;
-        ClaimsPrincipal currentUser = currentAuth.User;
+        currentUser = currentAuth.User;
 
         //events = _eventController.GetGroupEvents(currentUser);
         //events = _eventController.GetUserEvents(currentUser);

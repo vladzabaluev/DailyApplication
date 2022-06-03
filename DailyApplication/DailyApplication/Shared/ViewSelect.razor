@@ -1,24 +1,25 @@
-﻿
-    <button
-        class="btn btn-outline-dark"
-        @onclick="@(() => View.InvokeAsync("D"))"
-    >
-        D
-    </button>
-    <button
-        class="btn btn-outline-dark"
-        @onclick="@(() => View.InvokeAsync("W"))"
-    >
-        W
-    </button>
-    <button
-        class="btn btn-outline-dark"
-        @onclick="@(() => View.InvokeAsync("M"))"
-    >
-        M
-    </button>
+﻿<button
+    class="btn btn-outline-dark"
+    @onclick="@(() => View.InvokeAsync("D"))"
+>
+    D
+</button>
+<button
+    class="btn btn-outline-dark"
+    @onclick="@(() => View.InvokeAsync("W"))"
+>
+    W
+</button>
+<button
+    class="btn btn-outline-dark"
+    @onclick="@(() => View.InvokeAsync("M"))"
+>
+    M
+</button>
 
 @code {
     [Parameter]
     public EventCallback<string> View { get; set; }
+
+    //public string BtnClass => true ? "btn-dark" : "btn-outline-dark";
 }
