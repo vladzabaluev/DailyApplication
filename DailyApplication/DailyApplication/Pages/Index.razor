@@ -30,8 +30,8 @@
     <div class="d-flex justify-content-xl-center pt-5 mt-5">
     </div>
 
-    <div class="text-center mt-lg-4" @onmouseover="@(() => hover = !hover)" @onmouseout="@(() => hover = !hover)">
-        <NavLink class="btn btn-outline-primary btn-lg text-center align-middle" style="width:200px; height:50px" href="Identity/Account/Register">
+    <div class="text-center mt-lg-4" >
+        <NavLink @onmouseover="@(() => hover = !hover)" @onmouseout="@(() => hover = !hover)" class="btn btn-outline-primary btn-lg text-center align-middle" style="width:200px; height:50px" href="Identity/Account/Register">
             @btnText
         </NavLink>
     </div>

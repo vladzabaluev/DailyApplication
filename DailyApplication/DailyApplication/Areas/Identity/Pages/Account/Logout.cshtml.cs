@@ -38,7 +38,7 @@ namespace DailyApplication.Areas.Identity.Pages.Account
             }
             else
             {
-                return RedirectToPage();
+                return Redirect("~/");
             }
         }
     }
