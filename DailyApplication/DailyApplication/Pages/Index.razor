@@ -1,6 +1,52 @@
-﻿@page "/"
+﻿@inject NavigationManager NavigationManager
 
-<div class="text-center mt-5">
-    <h1 class="display-4">Welcome to Hell</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@page "/"
+
+<div class="d-flex justify-content-xl-center pt-4 mt-3">
 </div>
+<div class="d-flex justify-content-xl-center pt-5 mt-3">
+</div>
+<div>
+    <div class="text-center my-lg-5">
+    <h1 class="display-3">Организуйте вашу жизнь.</h1>
+</div>
+
+<div class="d-flex justify-content-xl-center pt-5 mt-5">
+</div>
+<div class="d-flex justify-content-xl-center pt-2 mt-5">
+</div>
+
+<div class="row mt-5">
+    <div class="col d-flex justify-content-center">
+        <h3 class="text-center" style="width:400px">Скоординируйте вашу деятельность</h3>
+    </div>
+    <div class="col">
+        <h3 class="text-center">Станьте более собранным</h3>
+    </div>
+    <div class="col d-flex justify-content-center">
+        <h3 class="text-center" style="width:400px">Не держите все задачи в голове</h3>
+    </div>
+</div>
+<div class="d-flex justify-content-xl-center pt-5 mt-5">
+</div>
+
+<div class="text-center mt-lg-4">
+    <NavLink class="btn btn-outline-primary btn-lg text-center align-middle" style="width:200px; height:75px" href="Identity/Account/Register">
+        Стать смешариком
+    </NavLink>
+</div>
+</div>
+
+@code{
+    [CascadingParameter] protected Task<AuthenticationState> AuthStat { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        base.OnInitialized();
+        var user = (await AuthStat).User;
+        if(!user.Identity.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo($"authentication/login?returnUrl={Uri.EscapeDataString(NavigationManager.Uri)}");
+        }
+    }
+}
