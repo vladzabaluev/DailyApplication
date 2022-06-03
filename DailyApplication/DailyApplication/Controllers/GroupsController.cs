@@ -212,7 +212,7 @@ namespace DailyApplication.Controllers
         public async Task<List<User>> GetAllUsersInGroup(Group group)
         {
             List<User> usersInGroup = new List<User>();
-            List<UserGroup> userGroups = await _context.UserGroup.Where(usGr => usGr.Group == group).ToListAsync();
+            List<UserGroup> userGroups = await _context.UserGroup.Where(usGr => usGr.Group == group).Include("User").ToListAsync();
             foreach (UserGroup ug in userGroups)
             {
                 usersInGroup.Add(ug.User);

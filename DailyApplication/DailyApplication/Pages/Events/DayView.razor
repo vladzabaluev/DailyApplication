@@ -3,7 +3,7 @@
 <div class="col px-1 overflow-hidden" style="width:14.28%; height: 65vh;" @onmouseover=ToggleCreateBtn @onmouseout=ToggleCreateBtn>
     <div class="border-bottom border-secondary px-1">
         <h5 class="text-right">@Date.ToString("m")</h5>
-        <h6 class="text-right">@weekDays[weekDay]</h6>
+        <h6 class="text-right">@Date.ToString("ddd")</h6>
     </div>
     <div class="px-2 h-100">
         @foreach (var item in Events)

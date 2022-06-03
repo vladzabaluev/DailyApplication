@@ -1,6 +1,6 @@
 ﻿@inject DailyApplication.Controllers.EventsController _eventsController
 
-<div class="alert @alertStyle" style="height:11vh; border:solid 1px">
+<div class="alert @alertStyle overflow-hidden" style="height:11vh; border:solid 1px">
 @*<div class="container rounded border border-dark px-3 pt-2" style="height:11vh;">*@
     @Date.ToString("m")
     @foreach (Event item in Events)
