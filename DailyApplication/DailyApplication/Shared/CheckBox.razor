@@ -2,11 +2,11 @@
 
 @if (SubEvents[Index].isDone)
 {
-    <input type="checkbox" style="width: 20px; height: 20px;" checked @onchange="@(() => Done(SubEvents[Index]))" />
+    <input type="checkbox" style="width: 20px; height: 20px;" checked @onchange="@(() => Done(SubEvents[Index]))"/>
 }
 else
 {
-    <input type="checkbox" style="width: 20px; height: 20px;" @onchange="@(() => Done(SubEvents[Index]))" />
+    <input type="checkbox" style="width: 20px; height: 20px;" @onchange="@(() => Done(SubEvents[Index]))"/>
 }
 
 @code
@@ -23,9 +23,9 @@ else
     [Parameter]
     public int Index { get; set; }
 
-    private async void Done(Sub_event SubEvent)
+    private async void Done (Sub_event SubEvent)
     {
-        SubEvent = await _eventController.DoneSubEvent(SubEvent.Id);
+        await _eventController.DoneSubEvent(SubEvent.Id);
         if (SubEvent.Id == 0)
             SubEvent.isDone = !SubEvent.isDone;
         await cb.InvokeAsync(SubEvent.isDone);
