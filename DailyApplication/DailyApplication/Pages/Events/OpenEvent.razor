@@ -134,6 +134,13 @@ else
         </div>
     </div>
     <div class="modal-footer">
+        <div>
+            <input type="submit" value="Сохранить" class="btn btn-success" @onclick="(() => {
+                                                                                                changeEvent(Item);
+                                                                                                Change();
+                                                                                                Toggle.InvokeAsync(DateTime.Now);
+                                                                                           })" @onclick:preventDefault />
+        </div>
         <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick=Change>Изменить</button>
         <button type="button" class="btn btn-danger" data-dismiss="modal" @onclick="(() => {Delete.InvokeAsync(Item);
             Toggle.InvokeAsync();
