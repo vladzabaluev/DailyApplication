@@ -27,10 +27,9 @@ namespace DailyApplication.Controllers
         public List<Group> GetUserGroups(ClaimsPrincipal User)
         {
             List<Group> Groups = new List<Group>(); //сюда запишу все группы текущего пользователя
-            User currentUser = _userManager.GetUserAsync(User).Result; //найду текущего пользователя
 
             List<UserGroup> UserGroups = _context.UserGroup.Where
-                (findGroup => findGroup.User == currentUser && findGroup.UserIsInGroup == true).Include("Group").ToList();
+                (findGroup => findGroup.User == _userManager.GetUserAsync(User).Result && findGroup.UserIsInGroup == true).Include("Group").ToList();
             //найду все ЮзерГруппы, связанные с нашим юзером
 
             foreach (UserGroup ug in UserGroups) //благодаря юзергруппам найду все группы пользователя
