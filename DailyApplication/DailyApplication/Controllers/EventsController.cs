@@ -34,11 +34,13 @@ namespace DailyApplication.Controllers
         {
             using (var _context = _contextFactory.CreateDbContext())
             {
+                User user = await _userManager.GetUserAsync(User);
+                _context.Entry(user).State = EntityState.Unchanged;
                 Event newEvent = new Event()
                 {
                     Name = Name,
                     Description = Description,
-                    User = await _userManager.GetUserAsync(User),
+                    User = user,
                     DeadlineTime = DeadlineTime,
                     Group = group,
                     SubEvents = subEvents,
