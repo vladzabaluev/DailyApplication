@@ -22,17 +22,18 @@ namespace DailyApplication.Controllers
             _userManager = userManager;
         }
 
+
         #region Все группы пользователя
 
-        public async Task<List<Group>> GetUserGroups(ClaimsPrincipal User)
+        public async Task<List<Group>> GetUserGroups(ClaimsPrincipal user)
         {
+
             using (var _context = _contextFactory.CreateDbContext())
             {
                 List<Group> Groups = new List<Group>(); //сюда запишу все группы текущего пользователя
-                User currentUser = await _userManager.GetUserAsync(User); //найду текущего пользователя
 
                 List<UserGroup> UserGroups = await _context.UserGroup.Where
-                    (findGroup => findGroup.User == currentUser && findGroup.UserIsInGroup == true).Include("Group").ToListAsync();
+                    (findGroup => findGroup.User == _userManager.GetUserAsync(user).Result && findGroup.UserIsInGroup == true).Include("Group").ToListAsync();
                 //найду все ЮзерГруппы, связанные с нашим юзером
 
                 foreach (UserGroup ug in UserGroups) //благодаря юзергруппам найду все группы пользователя
