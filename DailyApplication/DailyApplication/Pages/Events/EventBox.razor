@@ -2,9 +2,11 @@
 
 @if (ModalOpen)
 {
-    <Modal Toggle=ToggleModalOpen>
-        <OpenEvent Toggle=ToggleModalOpen Item=Item Delete=DeleteEvent/>
-    </Modal>
+    <div @onclick:stopPropagation>
+        <Modal Toggle=ToggleModalOpen>
+            <OpenEvent Toggle=ToggleModalOpen Item=Item Delete=DeleteEvent/>
+        </Modal>
+    </div>
 }
 <div class="container border-top event overflow-hidden" @onmouseover=ToggleDelBtn @onmouseout=ToggleDelBtn>
     <div class="row">
