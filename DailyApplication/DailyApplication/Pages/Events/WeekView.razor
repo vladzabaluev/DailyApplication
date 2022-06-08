@@ -1,6 +1,6 @@
 ﻿@inject DailyApplication.Controllers.EventsController _eventController;
 
-<div class="col px-1 overflow-hidden" style="width:14.28%; min-height: 65vh;" @onmouseover=ToggleCreateBtn @onmouseout=ToggleCreateBtn @onclick=ToggleCreateBtn>
+<div class="col px-1 overflow-hidden" style="width:14.28%; min-height: 65vh;" @onmouseover=ToggleCreateBtn @onmouseout=ToggleCreateBtn>
     <div class="border-bottom border-secondary px-1">
         @if (today == week[weekDay])
         {
@@ -18,12 +18,16 @@
         {
             @if (item.DeadlineTime.ToString("MM/dd/yyyy") == week[weekDay].ToString("MM/dd/yyyy"))
             {
-                <EventBox Item="@item" DeleteEvent="@DeleteEvent" />
+                <div @onclick=ToggleCreateBtn>
+                    <EventBox Item="@item" DeleteEvent="@DeleteEvent" />
+                </div>
             }
         }
         <OnHoverBox collapseHover=@collapseCreateHover>
             <div class="d-inline-block justify-content-center w-100 h-100">
-                <button class="btn btn-outline-light mt-1 mb-3 w-100 h-100" @onclick="@(() => OpenCreateBox.InvokeAsync(week[weekDay]))">+</button>
+                <button class="btn btn-outline-light mt-1 mb-3 w-100 h-100" @onclick="@(() => {
+OpenCreateBox.InvokeAsync(week[weekDay]);
+})">+</button>
             </div>
         </OnHoverBox>
     </div>
