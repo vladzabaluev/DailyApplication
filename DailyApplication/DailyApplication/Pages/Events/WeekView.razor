@@ -1,6 +1,6 @@
 ﻿@inject DailyApplication.Controllers.EventsController _eventController;
 
-<div class="col px-1 overflow-hidden" style="width:14.28%; min-height: 65vh;" @onmouseover=ToggleCreateBtn @onmouseout=ToggleCreateBtn>
+<div class="col px-1 overflow-hidden" style="width:14.28%; min-height: 65vh;" @onmouseover=ToggleCreateBtn @onmouseout=ToggleCreateBtn @onclick=ToggleCreateBtn>
     <div class="border-bottom border-secondary px-1">
         @if (today == week[weekDay])
         {
