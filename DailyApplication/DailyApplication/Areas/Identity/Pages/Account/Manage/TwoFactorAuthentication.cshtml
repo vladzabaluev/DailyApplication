@@ -1,0 +1,57 @@
+﻿@page
+@model TwoFactorAuthenticationModel
+@{
+    ViewData["Title"] = "Двухфакторная аутентификация";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<h4>@ViewData["Title"]</h4>
+@if (Model.Is2faEnabled)
+{
+    if (Model.RecoveryCodesLeft == 0)
+    {
+        <div class="alert alert-danger">
+            <strong>У вас не осталось кодов восстановления.</strong>
+            <p>Вы должны <a asp-page="./GenerateRecoveryCodes">сгенерировать новый набор кодов восстановления</a> прежде чем вы решите войти с помощью кодов восстановления. Я русский.</p>
+        </div>
+    }
+    else if (Model.RecoveryCodesLeft == 1)
+    {
+        <div class="alert alert-danger">
+            <strong>У вас остался один код восстановления.</strong>
+            <p>Вы можете <a asp-page="./GenerateRecoveryCodes">сгенерировать новый набор кодов восстановления</a>.</p>
+        </div>
+    }
+    else if (Model.RecoveryCodesLeft <= 3)
+    {
+        <div class="alert alert-warning">
+            <strong>У вас осталось @Model.RecoveryCodesLeft кодов восстановления.</strong>
+            <p>Вы должны <a asp-page="./GenerateRecoveryCodes">сгенерировать новый набор кодов восстановления</a>.</p>
+        </div>
+    }
+
+    if (Model.IsMachineRemembered)
+    {
+        <form method="post" style="display: inline-block">
+            <button type="submit" class="btn btn-default">Забыть этот браузер</button>
+        </form>
+    }
+    <a asp-page="./Disable2fa" class="btn btn-default">Отключить двухфакторную аутентификация</a>
+    <a asp-page="./GenerateRecoveryCodes" class="btn btn-default">Сбросить коды восстановления</a>
+}
+
+<h5>Приложения для проверки подлинности</h5>
+@if (!Model.HasAuthenticator)
+{
+    <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-default">Добавить приложение для проверки подлинности</a>
+}
+else
+{
+    <a id="enable-authenticator" asp-page="./EnableAuthenticator" class="btn btn-default">Настроить приложение для проверки подлинности</a>
+    <a id="reset-authenticator" asp-page="./ResetAuthenticator" class="btn btn-default">Сбросить приложение для проверки подлинности</a>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
