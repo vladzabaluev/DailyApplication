@@ -7,7 +7,9 @@
     {
         @if (item.DeadlineTime.ToString("MM/dd/yyyy") == Date.ToString("MM/dd/yyyy"))
         {
-            <EventBox Item="@item" DeleteEvent="@DeleteEvent" />
+            <div @onclick=ToggleCreateBtn>
+                <EventBox Item="@item" DeleteEvent="@DeleteEvent" />
+            </div>
         }
     }
     <OnHoverBox collapseHover=@collapseCreateHover>

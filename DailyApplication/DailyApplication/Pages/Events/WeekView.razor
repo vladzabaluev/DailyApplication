@@ -14,15 +14,15 @@
         }
     </div>
     <div class="px-2 h-100">
-        @foreach (var item in events)
-        {
-            @if (item.DeadlineTime.ToString("MM/dd/yyyy") == week[weekDay].ToString("MM/dd/yyyy"))
+        <div @onclick=ToggleCreateBtn>
+            @foreach (var item in events)
             {
-                <div @onclick=ToggleCreateBtn>
+                @if (item.DeadlineTime.ToString("MM/dd/yyyy") == week[weekDay].ToString("MM/dd/yyyy"))
+                {
                     <EventBox Item="@item" DeleteEvent="@DeleteEvent" />
-                </div>
+                }
             }
-        }
+        </div>
         <OnHoverBox collapseHover=@collapseCreateHover>
             <div class="d-inline-block justify-content-center w-100 h-100">
                 <button class="btn btn-outline-light mt-1 mb-3 w-100 h-100" @onclick="@(() => {
