@@ -60,7 +60,10 @@
                 @*<input value="@subEventList[i]" @onchange="((ChangeEventArgs __e) => OneSub(__e.Value.ToString(), i))"  class="alert alert-secondary" role="alert" />*@
                 @*<div class="alert alert-secondary" role="alert">@subEventList[i]</div>*@
                 <div>
-                    <Input SubEvents="@Item_subs" Index="@i" CallBack="@((value) => Item_subs = value)" />
+                    <Input SubEvents="@Item_subs" Index="@i" CallBack="@((value) => {
+                                                                                            Item_subs = value;
+                                                                                            changeEvent(Item);
+                                                                                            })" />
                 </div>
             }
             <input class="form-control" placeholder="Новое подсобытие" @bind=GetSubEvent />
