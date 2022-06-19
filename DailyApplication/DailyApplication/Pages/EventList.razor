@@ -113,27 +113,27 @@
     private int rows;
     DateTime day = DateTime.Today;
     CultureInfo myCI = new CultureInfo("en-US");
+    private DateTime GetFirstDateOfWeek(DateTime dayInWeek, DayOfWeek firstDay)
+    {
+        DateTime firstDayInWeek = dayInWeek.Date;
+        while (firstDayInWeek.DayOfWeek != firstDay)
+            firstDayInWeek = firstDayInWeek.AddDays(-1);
+
+        return firstDayInWeek;
+    }
     protected override void OnInitialized()
     {
         CalendarWeekRule myCWR = myCI.DateTimeFormat.CalendarWeekRule;
         DayOfWeek myFirstDOW = myCI.DateTimeFormat.FirstDayOfWeek;
 
-        DateTime GetFirstDateOfWeek(DateTime dayInWeek, DayOfWeek firstDay)
-        {
-            DateTime firstDayInWeek = dayInWeek.Date;
-            while (firstDayInWeek.DayOfWeek != firstDay)
-                firstDayInWeek = firstDayInWeek.AddDays(-1);
-
-            return firstDayInWeek;
-        }
+        
 
         var DateInit = new DateTime(DateTime.Now.Year, 1, 1, 0, 0, 0);
-        var DateMnthInit = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1, 0, 0, 0);
+        var FistDayInMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1, 0, 0, 0);
         DateInit = GetFirstDateOfWeek(DateInit, DayOfWeek.Monday);
-        DateMnthInit = GetFirstDateOfWeek(DateMnthInit, DayOfWeek.Monday);
         DateInit = myCI.Calendar.AddWeeks(DateInit, myCI.Calendar.GetWeekOfYear(DateTime.Now.AddDays(-1), myCWR, myFirstDOW) - 1);
         week = weekInit(DateInit);
-        month = monthInit(DateMnthInit);
+        month = monthInit(FistDayInMonth);
         WeekDate = $"{@week[0].ToString("m")} - {@week[6].ToString("m")}";
     }
 
@@ -148,17 +148,18 @@
         return week;
     }
 
-    private DateTime[] monthInit(DateTime DateMnthInit)
+    private DateTime[] monthInit(DateTime FistDayInMonth)
     {
+        DateTime DateMnthInit = GetFirstDateOfWeek(FistDayInMonth, DayOfWeek.Monday);
         DateTime[] month = new DateTime[42];
         month[0] = DateMnthInit;
         for (int i = 1; i < 42; i++)
         {
             month[i] = month[i - 1].AddDays(1);
         }
-        if (month[14].DayOfWeek == DayOfWeek.Sunday) rows = 6;
+        if (FistDayInMonth.DayOfWeek == DayOfWeek.Sunday) rows = 6;
         else rows = 5;
-        if (DateTime.DaysInMonth(month[14].Year, month[14].Month) == 28) rows = 4;
+        if (DateTime.DaysInMonth(month[14].Year, month[14].Month) == 28 && FistDayInMonth.DayOfWeek == DayOfWeek.Monday) rows = 4;
         return month;
     }
 
@@ -179,12 +180,14 @@
 
     void InMonth()
     {
-        month = monthInit(myCI.Calendar.AddMonths(month[0], +1));
+        DateTime FistDayInMonth = new DateTime(month[14].Year, month[14].Month, 1, 0, 0, 0);
+        month = monthInit(myCI.Calendar.AddMonths(FistDayInMonth, +1));
     }
 
     void DeMonth()
     {
-        month = monthInit(myCI.Calendar.AddMonths(month[0], -1));
+        DateTime FistDayInMonth = new DateTime(month[14].Year, month[14].Month, 1, 0, 0, 0);
+        month = monthInit(myCI.Calendar.AddMonths(FistDayInMonth, -1));
     }
 
     void InDay()
