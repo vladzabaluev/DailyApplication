@@ -97,7 +97,6 @@ namespace DailyApplication.Controllers
                 _context.Add(@group);
                 _context.Add(newUserGroup);
                 await _context.SaveChangesAsync();
-                RedirectToAction(nameof(EventsController.GetUserEvents));
             }
             return group;
         }

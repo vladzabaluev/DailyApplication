@@ -1,17 +1,17 @@
 ﻿<button
-    class="btn btn-outline-dark"
+    class="btn @BtnClassD"
     @onclick="@(() => View.InvokeAsync("D"))"
 >
     D
 </button>
 <button
-    class="btn btn-outline-dark"
+    class="btn @BtnClassW"
     @onclick="@(() => View.InvokeAsync("W"))"
 >
     W
 </button>
 <button
-    class="btn btn-outline-dark"
+    class="btn @BtnClassM"
     @onclick="@(() => View.InvokeAsync("M"))"
 >
     M
@@ -21,5 +21,10 @@
     [Parameter]
     public EventCallback<string> View { get; set; }
 
-    //public string BtnClass => true ? "btn-dark" : "btn-outline-dark";
+    [Parameter]
+    public string letter { get; set; }
+
+    private string BtnClassD => letter == "D" ? "btn-dark" : "btn-outline-dark";
+    private string BtnClassW => letter == "W" ? "btn-dark" : "btn-outline-dark";
+    private string BtnClassM => letter == "M" ? "btn-dark" : "btn-outline-dark";
 }

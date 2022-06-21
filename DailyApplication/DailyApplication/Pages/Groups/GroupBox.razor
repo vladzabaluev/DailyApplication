@@ -28,7 +28,7 @@
             <button class="btn btn-danger" @onclick:stopPropagation @onclick="(() => Exit.InvokeAsync(groups[Index]))">Выйти из группы</button>
         </div>
         <div>
-            <button class="btn btn-outline-primary" @onclick:stopPropagation>Изменить группу</button>
+            <button class="btn btn-outline-primary" @onclick="@(() => ModalOpen = !ModalOpen)" @onclick:stopPropagation>Изменить группу</button>
             <button class="btn btn-outline-danger " @onclick:stopPropagation @onclick="(()=>Delete.InvokeAsync(groups[Index]))">Удалить группу</button>
         </div>
     </div>
