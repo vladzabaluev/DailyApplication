@@ -1,5 +1,6 @@
 ﻿using DailyApplication.Data;
 using DailyApplication.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,9 @@ namespace DailyApplication.Controllers
         }
 
         #region Все группы пользователя
-
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public List<Group> GetUserGroups(ClaimsPrincipal User)
         {
             List<Group> Groups = new List<Group>(); //сюда запишу все группы текущего пользователя
@@ -42,7 +45,9 @@ namespace DailyApplication.Controllers
         }
 
         #endregion Все группы пользователя
-
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteGroup(int? id, EventsController eventsController)
         {
             if (id == null)
@@ -78,7 +83,7 @@ namespace DailyApplication.Controllers
         }
 
         #region Создание группы
-
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<Group> Create([Bind("Id,Name,Description")] Group @group, ClaimsPrincipal User)
@@ -98,7 +103,9 @@ namespace DailyApplication.Controllers
         }
 
         #endregion Создание группы
-
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditGroup(int id, [Bind("Id,Name,Description")] Group group)
         {
             if (id != @group.Id)
@@ -126,7 +133,9 @@ namespace DailyApplication.Controllers
             }
             return RedirectToAction(nameof(GetUserGroups));
         }
-
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<bool> UserExists(string email)
         {
             DailyApplication.Models.User user = await _context.User.Where(requiredUser => requiredUser.Email == email).FirstOrDefaultAsync();
@@ -139,7 +148,9 @@ namespace DailyApplication.Controllers
                 return false;
             }
         }
-
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task InviteUser(string email, Group group)
         {
             User invitedUSer = await _context.User.Where(requiredUser => requiredUser.Email == email).FirstOrDefaultAsync();
@@ -157,7 +168,9 @@ namespace DailyApplication.Controllers
                 }
             }
         }
-
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task UserAgree(ClaimsPrincipal user, Group group)
         {
             UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(usGr => usGr.Group == group
@@ -169,7 +182,9 @@ namespace DailyApplication.Controllers
                 await _context.SaveChangesAsync();
             }
         }
-
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task UserDisagree(ClaimsPrincipal user, Group group)
         {
             UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(usGr => usGr.Group == group
@@ -180,7 +195,9 @@ namespace DailyApplication.Controllers
                 await _context.SaveChangesAsync();
             }
         }
-
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task Exit(ClaimsPrincipal user, Group group, EventsController eventsController)
         {
             UserGroup userGroup = await _context.UserGroup.FirstOrDefaultAsync(usGr => usGr.Group == group
@@ -195,7 +212,9 @@ namespace DailyApplication.Controllers
                 await DeleteGroup(group.Id, eventsController);
             }
         }
-
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<List<Group>> GetAllInvites(ClaimsPrincipal user)
         {
             List<UserGroup> userGroupWasUserInvited = await _context.UserGroup.Where(usGr =>
@@ -207,7 +226,9 @@ namespace DailyApplication.Controllers
             }
             return groupWasUserInvited;
         }
-
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<List<User>> GetAllUsersInGroup(Group group)
         {
             List<User> usersInGroup = new List<User>();
