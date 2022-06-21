@@ -36,6 +36,10 @@
             </div>*@
             <div class="form-group">
                 <p class="font-weight-bold">Пользователи:</p>
+                @foreach(var user in Users)
+                {
+                    <p>@user</p>
+                }
             </div>
         </div>
         <div class="modal-footer">
