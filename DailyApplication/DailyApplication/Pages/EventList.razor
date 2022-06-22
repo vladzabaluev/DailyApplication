@@ -228,8 +228,6 @@
         AuthenticationState currentAuth = await authenticationStateTask;
         currentUser = currentAuth.User;
 
-        //events = _eventController.GetGroupEvents(currentUser);
-        //events = _eventController.GetUserEvents(currentUser);
         events = _eventController.GetAllUserEvent(currentUser, _groupController);
     }
     #endregion
